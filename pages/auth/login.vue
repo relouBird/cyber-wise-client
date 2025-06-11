@@ -65,7 +65,7 @@ const loginWithFacebook = () => {
       <!-- Logo -->
       <div class="logo-section mb-2">
         <div class="logo-square">
-          <img src="@/assets/images/image1.png" alt="">
+          <img src="~/assets/images/image1.png" alt="">
         </div>
         <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
       </div>

@@ -156,7 +156,7 @@ function handleLogout() {
     </v-main>
 
     <!-- Footer -->
-    <v-footer class="main-footer" color="surface">
+    <v-footer class="main-footer py-0" color="surface">
       <v-container>
         <v-row align="center">
           <v-col cols="12" md="6">
@@ -165,11 +165,11 @@ function handleLogout() {
               <span class="logo-text-small">mimo</span>
             </div>
             <p class="footer-text mt-2">
-              Plateforme d'apprentissage moderne pour développeurs
+              Plateforme d'apprentissage moderne pour apprentis en hacking
             </p>
           </v-col>
           <v-col cols="12" md="6" class="text-md-right">
-            <div class="footer-links">
+            <!-- <div class="footer-links">
               <nuxt-link
                 v-for="link in footerLinks"
                 :key="link.title"
@@ -178,7 +178,7 @@ function handleLogout() {
               >
                 {{ link.title }}
               </nuxt-link>
-            </div>
+            </div> -->
             <p class="footer-copyright mt-3">
               &copy; {{ currentYear }} Mimo. Tous droits réservés.
             </p>

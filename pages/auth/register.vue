@@ -35,7 +35,7 @@ const handleLogin = async () => {
     });
 
     // Redirection après connexion réussie
-    await navigateTo("/");
+    await navigateTo("/configuration/first-step");
   } catch (error) {
     console.error("Erreur de connexion:", error);
   } finally {
@@ -76,7 +76,7 @@ const loginWithFacebook = () => {
       <div :class="'logo-section', signWithCredentials == false ? ' mb-2': ' mb-0'">
       <!-- <div :class=" 'logo-section' + signWithCredentials == false ? ' mb-2': ' mb-0'"> -->
         <div class="logo-square">
-          <img src="@/assets/images/image1.png" alt="">
+          <img src="~/assets/images/image1.png" alt="">
         </div>
         <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
       </div>
