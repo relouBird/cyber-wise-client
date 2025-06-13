@@ -1,18 +1,42 @@
-type StateProps = {
-  identifier: string | null;
+type NotificationStoreType = {
+  color: "error" | "success";
+  message: string | null;
+  timeout: number;
+  visible: boolean;
+  options: any;
 };
-
-const useNotificationStore = defineStore("notification-store", {
+export const useNotificationStore = defineStore("notification-store", {
   state: () =>
-    <StateProps>{
-      identifier: "notify",
+    <NotificationStoreType>{
+      color: "error",
+      message: null,
+      timeout: 10000,
+      visible: false,
+      options: {},
     },
-  persist: true,
-  getters: {},
+  getters: {
+    getNotification(state) {
+      return state;
+    },
+
+    isVisible(state) {
+      return state.visible;
+    },
+  },
   actions: {
-    setNotification(config: any) {},
-    show() {},
+    close() {
+      this.visible = false;
+    },
+    show() {
+      this.visible = true;
+    },
+    setNotification(config: any) {
+      this.message = config.message ?? "";
+      this.color = config.color ?? "success";
+      this.timeout = config.timeout ?? 10000;
+      // this.visible = config.visible ?? true;
+      if ("options" in config) {
+      }
+    },
   },
 });
-
-export default useNotificationStore;

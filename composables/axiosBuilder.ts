@@ -1,5 +1,7 @@
 import axios, { AxiosError, type AxiosResponse } from "axios";
 import { v4 as uuidv4 } from "uuid";
+import { notify } from "~/helpers/notifications";
+import type { ErrorBackend } from "~/types/error.type";
 
 function useAuthentication(): { token: any } {
   throw new Error("Function not implemented.");
@@ -24,13 +26,16 @@ export default function axiosBuilder() {
     const auth = config?.auth ?? false;
     const requestId = config.headers["x-request-id"] ?? uuidv4();
 
+    if (!config.headers["x-request-id"]) {
+      config.headers["x-request-id"] = requestId;
+    }
+
     if (auth) {
       const { token } = useAuthentication();
       config.headers["Authorization"] = `${token.value}`;
     }
 
     console.log(`[${requestId}] api-request send -->`, config);
-    console.log(`[${requestId}] currentConfig.value -->`, config);
 
     return config;
   });
@@ -44,10 +49,22 @@ export default function axiosBuilder() {
     },
     (error: AxiosError) => {
       const response = error.response as AxiosResponse;
+      const errorParticularity = response.data as ErrorBackend;
 
       const requestId = response.config.headers["X-Request-Id"];
 
       console.log(`[${requestId}] api-response-error  -->`, response);
+      console.log(
+        `[${requestId}] api-response-error  -->`,
+        errorParticularity.details
+      );
+
+      // Ceci envoie la notification directement dans le store de notifications mais àa partir du helpers
+      notify({
+        color: "error",
+        message: errorParticularity.details,
+        visible: true,
+      });
 
       return error.response;
 
