@@ -10,7 +10,7 @@ export const useNotificationStore = defineStore("notification-store", {
     <NotificationStoreType>{
       color: "error",
       message: null,
-      timeout: 10000,
+      timeout: 5000,
       visible: false,
       options: {},
     },
@@ -33,7 +33,7 @@ export const useNotificationStore = defineStore("notification-store", {
     setNotification(config: any) {
       this.message = config.message ?? "";
       this.color = config.color ?? "success";
-      this.timeout = config.timeout ?? 10000;
+      this.timeout = config.timeout ?? 5000;
       // this.visible = config.visible ?? true;
       if ("options" in config) {
       }

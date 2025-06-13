@@ -6,11 +6,16 @@ const store = storeToRefs(useNotification);
 
 function handleClose() {
   useNotification.close();
-  console.log("____verification____")
+  console.log("____verification____");
 }
 
-watch(store.message, (newVal) => {
-  console.log("new-notification =>", newVal);
+watch(store.visible, (newVal) => {
+  console.log("new-notification =>", store.message.value);
+  setTimeout(() => {
+    if (store.isVisible.value) {
+      useNotification.close();
+    }
+  }, store.timeout.value);
 });
 </script>
 
@@ -24,6 +29,7 @@ watch(store.message, (newVal) => {
       v-model="store.visible.value"
       :close-label="store.color.value"
       :color="store.color.value"
+      class="animate-notif"
       theme="dark"
       border
       closable
@@ -41,5 +47,17 @@ watch(store.message, (newVal) => {
   bottom: 5em;
   right: 2em;
   z-index: 1000;
+}
+.animate-notif {
+  animation: come 400ms linear;
+}
+
+@keyframes come {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 </style>

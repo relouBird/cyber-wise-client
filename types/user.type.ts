@@ -1,5 +1,5 @@
 export type LoginCredentialType = {
-  identifier: string;
+  email: string;
   password: string | null;
   remember?: boolean;
   guard: string;

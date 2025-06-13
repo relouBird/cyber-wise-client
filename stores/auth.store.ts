@@ -32,7 +32,7 @@ const useAuthStore = defineStore("auth-store", {
   actions: {
     async login(payload: LoginCredentialType) {
       // garde d'abord les données utiles pour le login dans le state
-      this.identifier = payload.identifier;
+      this.identifier = payload.email;
       console.log("identifier =>", this.identifier);
 
       let response: AxiosResponse =
@@ -66,7 +66,7 @@ const useAuthStore = defineStore("auth-store", {
         this.user = data.data.user;
         this.access_token = data.data.session.access_token;
         this.refresh_token = data.data.session.refresh_token;
-        await navigateTo("/");
+        await navigateTo("/configuration/first-step");
       } else if (response.status == 500) {
         console.log("error =>", response.data);
       }

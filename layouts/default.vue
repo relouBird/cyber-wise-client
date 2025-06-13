@@ -1,7 +1,6 @@
 <script setup>
 import useAuthStore from "~/stores/auth.store";
 
-
 const authStore = useAuthStore();
 
 // État de la sidebar mobile
@@ -72,8 +71,12 @@ async function handleLogout() {
       <!-- Logo -->
       <nuxt-link to="/" class="logo-link">
         <div class="logo-container">
-          <div class="logo-square-small"></div>
-          <span class="logo-text-small">mimo</span>
+          <div class="logo-square-small">
+            <img src="~/assets/images/image1.png" alt="" />
+          </div>
+          <span class="logo-text-small font-manrope font-manrope-400">
+            SafeSteps
+          </span>
         </div>
       </nuxt-link>
 
@@ -162,26 +165,20 @@ async function handleLogout() {
         <v-row align="center">
           <v-col cols="12" md="6">
             <div class="footer-logo">
-              <div class="logo-square-small"></div>
-              <span class="logo-text-small">mimo</span>
+              <div class="logo-square-small">
+                <img src="~/assets/images/image1.png" alt="" />
+              </div>
+              <span class="logo-text-small font-manrope font-manrope-400"
+                >SafeSteps</span
+              >
             </div>
             <p class="footer-text mt-2">
               Plateforme d'apprentissage moderne pour apprentis en hacking
             </p>
           </v-col>
           <v-col cols="12" md="6" class="text-md-right">
-            <!-- <div class="footer-links">
-              <nuxt-link
-                v-for="link in footerLinks"
-                :key="link.title"
-                :to="link.to"
-                class="footer-link"
-              >
-                {{ link.title }}
-              </nuxt-link>
-            </div> -->
             <p class="footer-copyright mt-3">
-              &copy; {{ currentYear }} Mimo. Tous droits réservés.
+              &copy; {{ currentYear }} SafeSteps. Tous droits réservés.
             </p>
           </v-col>
         </v-row>
@@ -207,10 +204,15 @@ async function handleLogout() {
 }
 
 .logo-square-small {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #ff6b9d, #ff8cc8);
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+}
+
+.logo-square-small img {
+  width: 100%;
+  height: auto;
+  transform: scale(150%);
 }
 
 .logo-text-small {
