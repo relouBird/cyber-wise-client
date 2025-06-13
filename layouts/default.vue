@@ -1,5 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import useAuthStore from "~/stores/auth.store";
+
+
+const authStore = useAuthStore();
 
 // État de la sidebar mobile
 const drawer = ref(false);
@@ -43,11 +46,9 @@ const footerLinks = [
 const currentYear = new Date().getFullYear();
 
 // Fonction de déconnexion
-function handleLogout() {
-  // Logique de déconnexion
-  console.log("Déconnexion...");
-  // Redirection vers login
-  navigateTo("/auth/login");
+async function handleLogout() {
+  // ceci appelle auth et le deconnecte
+  await authStore.signOut();
 }
 </script>
 

@@ -1,4 +1,7 @@
 <script setup>
+import * as yup from "yup";
+import useAuthStore from "~/stores/auth.store";
+
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
@@ -12,11 +15,21 @@ useHead({
   ],
 });
 
-// Variables réactives
+const authStore = useAuthStore();
+const store = storeToRefs(authStore);
 
-// Variables réactives
-const email = ref("");
-const password = ref("");
+// Creer un formulaire reactif
+const form = useForm(
+  yup.object().shape({
+    email: yup.string().email(),
+    password: yup.string().min(6, "Password is too weak").required(),
+  }),
+  {
+    email: store.identifier.value ?? "",
+    password: "",
+  }
+);
+
 const showPassword = ref(false);
 const loading = ref(false);
 
@@ -25,17 +38,11 @@ const handleLogin = async () => {
   loading.value = true;
 
   try {
-    // Simulation d'une connexion
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await form.submit(async () => await authStore.login(form.data));
 
-    // Ici vous ajouteriez votre logique de connexion
-    console.log("Login avec:", {
-      email: email.value,
-      password: password.value,
-    });
-
-    // Redirection après connexion réussie
-    await navigateTo("/");
+    form.clear();
+    form.data.password = "";
+    loading.value = false;
   } catch (error) {
     console.error("Erreur de connexion:", error);
   } finally {
@@ -46,11 +53,6 @@ const handleLogin = async () => {
 const loginWithGoogle = () => {
   console.log("Connexion avec Google");
   // Logique de connexion Google
-};
-
-const loginWithApple = () => {
-  console.log("Connexion avec Apple");
-  // Logique de connexion Apple
 };
 
 const loginWithFacebook = () => {
@@ -65,7 +67,7 @@ const loginWithFacebook = () => {
       <!-- Logo -->
       <div class="logo-section mb-2">
         <div class="logo-square">
-          <img src="~/assets/images/image1.png" alt="">
+          <img src="~/assets/images/image1.png" alt="" />
         </div>
         <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
       </div>
@@ -78,7 +80,9 @@ const loginWithFacebook = () => {
         <div class="">
           <label class="form-label">Email</label>
           <v-text-field
-            v-model="email"
+            v-model="form.data.email"
+            :error-messages="form.errors.email"
+            @change="form.validateField('email')"
             type="email"
             placeholder="Your e-mail"
             variant="outlined"
@@ -91,7 +95,9 @@ const loginWithFacebook = () => {
         <div class="">
           <label class="form-label">Password</label>
           <v-text-field
-            v-model="password"
+            :error-messages="form.errors.password"
+            v-model="form.data.password"
+            @change="form.validateField('password')"
             :type="showPassword ? 'text' : 'password'"
             placeholder="Your password"
             variant="outlined"
@@ -103,7 +109,20 @@ const loginWithFacebook = () => {
         </div>
 
         <!-- Bouton de connexion -->
-        <v-btn type="submit" class="login-btn mb-6" block :loading="loading">
+        <v-btn
+          type="submit"
+          class="login-btn mb-6"
+          block
+          :disabled="
+            form.isInValid instanceof Object
+              ? form.isInValid.value
+              : form.isInValid ||
+                (form.processing instanceof Object
+                  ? form.processing.value
+                  : form.processing)
+          "
+          :loading="loading"
+        >
           Log in
         </v-btn>
       </v-form>
@@ -176,7 +195,7 @@ const loginWithFacebook = () => {
   border-radius: 12px;
 }
 
-.logo-square img{
+.logo-square img {
   width: 100%;
   height: auto;
   transform: scale(290%);

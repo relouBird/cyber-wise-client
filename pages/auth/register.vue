@@ -55,7 +55,7 @@ const handleLogin = async () => {
     const response = await form.submit(
       async () => await authStore.register(form.data)
     );
-    console.log("response-send => ", response);
+
     form.clear();
     form.data.password = "";
     form.data.password_confirmation = "";
