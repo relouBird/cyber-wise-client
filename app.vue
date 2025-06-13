@@ -43,7 +43,7 @@ watch(store.visible, (newVal) => {
 
 <style scoped>
 .bottom {
-  position: absolute;
+  position: absolute !important;
   bottom: 5em;
   right: 2em;
   z-index: 1000;

@@ -8,6 +8,7 @@ export type ServiceProps = {
 
   find?: (model: any, query: any) => AxiosResponse | any;
   fetch?: (query: any) => AxiosResponse | any;
+  fetchAll?: () => AxiosResponse | any;
 
   createMany?: (payload: any) => AxiosResponse;
   updateMany?: (payload: any) => AxiosResponse;

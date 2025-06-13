@@ -1,11 +1,8 @@
 import axios, { AxiosError, type AxiosResponse } from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { notify } from "~/helpers/notifications";
+import { authAddToken } from "~/helpers/request_axios";
 import type { ErrorBackend } from "~/types/error.type";
-
-function useAuthentication(): { token: any } {
-  throw new Error("Function not implemented.");
-}
 
 export default function axiosBuilder() {
   const { public: publicRuntimeConfig } = useRuntimeConfig();
@@ -14,7 +11,7 @@ export default function axiosBuilder() {
    * axios setup to use mock service
    */
 
-  const api: any = axios.create({
+  const api = axios.create({
     baseURL: `${publicRuntimeConfig.API_BASE_URL}`,
     method: "get",
   });
@@ -22,17 +19,19 @@ export default function axiosBuilder() {
   /**
    * Se produit juste avant l'envoi de la requête
    */
-  api.interceptors.request.use((config: any) => {
-    const auth = config?.auth ?? false;
+  api.interceptors.request.use((config) => {
+    const auth = config.auth ?? false;
     const requestId = config.headers["x-request-id"] ?? uuidv4();
 
     if (!config.headers["x-request-id"]) {
       config.headers["x-request-id"] = requestId;
     }
 
-    if (auth) {
-      const { token } = useAuthentication();
-      config.headers["Authorization"] = `${token.value}`;
+    if (!config.url?.includes("auth")) {
+      const token = authAddToken();
+      console.log("token =>", token?.slice(0, 10));
+      config.headers["Access-Control-Allow-Origin"] = "*";
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
 
     console.log(`[${requestId}] api-request send -->`, config);

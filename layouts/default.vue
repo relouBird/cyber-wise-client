@@ -12,6 +12,7 @@ const navigationItems = [
   { title: "Cours", to: "/courses", icon: "mdi-school" },
   { title: "Projets", to: "/projects", icon: "mdi-folder-multiple" },
   { title: "Communauté", to: "/community", icon: "mdi-account-group" },
+  { title: "Test", to: "/test", icon: "mdi-test-tube-empty" },
 ];
 
 // Notifications (exemple)
@@ -31,14 +32,6 @@ const userActions = [
   },
   { title: "Aide", icon: "mdi-help-circle", action: () => navigateTo("/help") },
   { title: "Déconnexion", icon: "mdi-logout", action: handleLogout },
-];
-
-// Liens du footer
-const footerLinks = [
-  { title: "À propos", to: "/about" },
-  { title: "Contact", to: "/contact" },
-  { title: "Confidentialité", to: "/privacy" },
-  { title: "Conditions", to: "/terms" },
 ];
 
 // Année courante
