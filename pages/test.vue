@@ -2,6 +2,11 @@
 import useTestStore from "~/stores/test.store";
 import type { UserDescription } from "~/types/test.type";
 
+// Définir le Middleware à utiliser
+definePageMeta({
+  middleware: "auth",
+});
+
 const testStore = useTestStore();
 
 const datas = ref<UserDescription[]>([]);
@@ -11,6 +16,7 @@ onMounted(async () => {
     const response = await testStore.getAllTests();
     datas.value = response.data;
     console.log("response =>", response);
+    // navigateTo("/auth/login");
   } catch (error) {
     console.log(error);
   }
@@ -19,7 +25,10 @@ onMounted(async () => {
 
 <template>
   <div class="pa-3">
-    <h2 class="font-manrope font-manrope-400">All Tests Users</h2>
+    <div class="d-flex align-center ga-3 pb-4">
+      <h2 class="font-manrope font-manrope-400">All Tests Users</h2>
+      <v-btn class="text-none">Create User</v-btn>
+    </div>
 
     <v-row class="pt-3">
       <Profilecard

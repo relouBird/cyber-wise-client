@@ -5,6 +5,7 @@ import useAuthStore from "~/stores/auth.store";
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
+  middleware: "auth-default"
 });
 
 // Meta tags
@@ -240,8 +241,11 @@ watch(form.data, () => {
       <div class="auth-links">
         <p class="mb-2">
           ALready have account ?
-          <nuxt-link to="/auth/login" class="auth-link">connect now</nuxt-link>
+          <nuxt-link to="/enterprise/auth/login" class="auth-link">connect now</nuxt-link>
         </p>
+        <nuxt-link to="/auth/login" class="auth-link">
+          Connect as employee
+        </nuxt-link>
       </div>
     </v-card-text>
   </v-card>

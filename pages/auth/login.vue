@@ -5,6 +5,7 @@ import useAuthStore from "~/stores/auth.store";
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
+  middleware: "auth-default"
 });
 
 // Meta tags
@@ -160,8 +161,8 @@ const loginWithFacebook = () => {
       <!-- Liens utiles -->
       <div class="auth-links">
         <p class="mb-2">
-          Don't have an account?
-          <nuxt-link to="/auth/register" class="auth-link"
+          Do you have enterprise ?
+          <nuxt-link to="/enterprise/auth/register" class="auth-link"
             >Create an account</nuxt-link
           >
         </p>

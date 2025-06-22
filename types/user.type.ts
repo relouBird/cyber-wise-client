@@ -62,7 +62,10 @@ export type UserData = {
   session: Session;
 };
 
+export type UserType = "employee" | "enterprise"
+
 export type UserResponse = {
   message : string;
   data : UserData;
+  type: UserType
 }

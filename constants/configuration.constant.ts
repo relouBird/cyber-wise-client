@@ -1,68 +1,74 @@
 import type { ConfigurationInterface } from "~/types/configuration.type";
 import IMG1 from "~/assets/images/image1.png";
+import CHOICE1 from "~/assets/images/configuration/dossier.png";
+import CHOICE2 from "~/assets/images/configuration/alert.png";
+import CHOICE3 from "~/assets/images/configuration/shield.png";
+import CHOICE4 from "~/assets/images/configuration/graduation-hat.png";
+import CHOICE5 from "~/assets/images/configuration/group.png";
+import CHOICE6 from "~/assets/images/configuration/chalkboard.png";
 
 export const reasons: ConfigurationInterface[] = [
   {
-    title: "To become a professional on ethical hacking",
+    title: "Pour fournir des outils à mes élèves ou formateurs",
     option: "step1",
-    image: IMG1,
+    image: CHOICE1,
   },
   {
-    title: "Just for fun",
+    title: "Pour sensibiliser le personnel de ma structure",
     option: "step2",
-    image: IMG1,
+    image: CHOICE2,
   },
   {
-    title: "It's for my enterprise and working advice",
+    title: "Pour simuler et tester des attaques avant déploiement",
     option: "step3",
-    image: IMG1,
+    image: CHOICE3,
   },
 ];
 
 export const interest: ConfigurationInterface[] = [
   {
-    title: "Phishing",
+    title: "Apprenants / Étudiants",
     option: "interest1",
-    image: IMG1,
+    image: CHOICE4,
   },
   {
-    title: "Attack by DDOS",
+    title: "Collegues / Employés",
     option: "interest2",
-    image: IMG1,
+    image: CHOICE5,
   },
   {
-    title: "Ransomware",
+    title: "Formateurs / Encadrants",
     option: "interest3",
-    image: IMG1,
+    image: CHOICE6,
   },
 ];
 
 export const times: ConfigurationInterface[] = [
   {
-    title: "Casual",
+    title: "Occasionnel",
     option: "5 minutes",
   },
   {
-    title: "Regular",
+    title: "Régulier",
     option: "10 minutes",
   },
   {
-    title: "Serious",
+    title: "Sérieux",
     option: "20 minutes",
   },
 ];
 
 export const days: ConfigurationInterface[] = [
   {
-    title: "A Little",
+    title: "Minimum",
     option: "2 days",
   },
   {
-    title: "Approximately",
+    title: "Moyen",
     option: "3 days",
   },
   {
-    title: "A Lot",
+    title: "Beaucoup",
     option: "5 days",
   },
 ];

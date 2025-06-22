@@ -5,13 +5,16 @@ import type {
   RegisterCredentialType,
   User,
   UserResponse,
+  UserType,
 } from "~/types/user.type";
 
 type StateProps = {
   identifier: string;
-  user: User | null;
+  type: UserType;
   access_token: string | null;
   refresh_token: string | null;
+  expired_at: number | null;
+  is_configuring: boolean;
 };
 
 // le service qui gère les requetes
@@ -21,9 +24,11 @@ const useAuthStore = defineStore("auth-store", {
   state: () =>
     <StateProps>{
       identifier: "",
-      user: null,
+      type: "employee",
       access_token: null,
       refresh_token: null,
+      expired_at: null,
+      is_configuring: false,
     },
   persist: true,
   getters: {
@@ -35,16 +40,20 @@ const useAuthStore = defineStore("auth-store", {
       this.identifier = payload.email;
       console.log("identifier =>", this.identifier);
 
-      let response: AxiosResponse =
-        service.login && (await service.login(payload));
+      let response: AxiosResponse = await service.login(payload);
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as UserResponse;
         console.log("data-income =>", data.data);
-        this.user = data.data.user;
         this.access_token = data.data.session.access_token;
         this.refresh_token = data.data.session.refresh_token;
-        await navigateTo("/");
+        this.expired_at = data.data.session.expires_at * 1000;
+        this.type = data.type;
+        if (this.type == "employee") {
+          return navigateTo("/");
+        } else {
+          return navigateTo("/enterprise");
+        }
       } else if (response.status == 500) {
         console.log("error =>", response.data);
       }
@@ -57,15 +66,16 @@ const useAuthStore = defineStore("auth-store", {
 
       console.log("identifier =>", this.identifier);
 
-      let response: AxiosResponse =
-        service.register && (await service.register(payload));
+      let response: AxiosResponse = await service.register(payload);
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as UserResponse;
         console.log("data-income =>", data.data);
-        this.user = data.data.user;
         this.access_token = data.data.session.access_token;
         this.refresh_token = data.data.session.refresh_token;
+        this.expired_at = data.data.session.expires_at * 1000;
+        this.type = data.type;
+        this.is_configuring = true;
         await navigateTo("/configuration/first-step");
       } else if (response.status == 500) {
         console.log("error =>", response.data);
@@ -74,12 +84,19 @@ const useAuthStore = defineStore("auth-store", {
       return response;
     },
 
-    async signOut() {
+    async firstStepConfiguring(desc: string) {},
+
+    async SecondStepConfiguring(desc: string) {
+      this.is_configuring = false;
+    },
+
+    signOut() {
+      // Ne jamais l'appeler dans le middleware cause des erreurs inattendus en vide le localstorage meme avant utilisation...
       // this is for signout user....
-      this.user = null;
       this.access_token = null;
       this.refresh_token = null;
-      await navigateTo("/auth/login");
+      this.expired_at = null;
+      return navigateTo("/auth/login");
     },
   },
 });

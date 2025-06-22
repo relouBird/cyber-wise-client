@@ -10,8 +10,3 @@ export const request = async (
   return await api.request(options);
 };
 
-export const authAddToken = () => {
-  const authStore = useAuthStore();
-
-  return authStore.access_token;
-};

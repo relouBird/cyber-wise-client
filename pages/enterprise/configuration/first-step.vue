@@ -1,9 +1,10 @@
 <script setup>
-import { times, days } from "~/constants/configuration.constant";
+import { reasons, interest } from "~/constants/configuration.constant";
 
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
+  middleware: ["auth", "user"],
 });
 
 // Meta tags
@@ -12,33 +13,32 @@ useHead({
   meta: [{ name: "description", content: "Configurer votre espace" }],
 });
 
-const periodOnDay = ref("");
-const periodOnWeek = ref("");
+const whyLearnBool = ref("");
+const interestBool = ref("");
 const step = ref(0);
 
-const timesData = reactive(times);
-const daysData = reactive(days);
+const reasonsDatas = reactive(reasons);
+const interestDatas = reactive(interest);
 
 const previousFunction = (prev) => {
   if (step.value == 0) {
     // nothing
   } else {
-    step.value--;
+    step.value = step.value - 1;
     prev();
   }
   console.log("step =>", step.value);
 };
 
 const nextFunction = async (next) => {
-  if (periodOnWeek.value != "" && step.value == 1) {
-    await navigateTo("/");
-  } else if (periodOnDay.value != "" && step.value == 0) {
+  if (interestBool.value != "" && step.value == 1) {
+    await navigateTo("/enterprise/configuration/second-step");
+  } else if (whyLearnBool.value != "" && step.value == 0) {
     next();
-    step.value++;
+    step.value = step.value + 1;
   } else {
     // nothing...
   }
-
   console.log("step =>", step.value);
 };
 </script>
@@ -46,11 +46,11 @@ const nextFunction = async (next) => {
 <template>
   <v-card class="login-card" elevation="0">
     <v-card-text class="text-center pa-6">
-      <h2 class="logo-text pt-2 pb-4 w-75 font-manrope font-manrope-400">
+      <h2 class="logo-text pt-2 pb-4 font-manrope font-manrope-400">
         {{
           step == 0
-            ? "How much time do you want to spend learning?"
-            : "How much day on week can you take to learn?"
+            ? "Dans quel but principal allez-vous utiliser cette application ?"
+            : "Quels types d'utilisateurs allez-vous inviter dans votre espace ?"
         }}
       </h2>
       <v-stepper>
@@ -58,41 +58,35 @@ const nextFunction = async (next) => {
           <v-stepper-header>
             <v-stepper-item
               color="primary"
-              title="On a Day"
+              title="Raison"
               value="1"
             ></v-stepper-item>
             <div class="step-divider"></div>
             <v-stepper-item
               color="primary"
-              title="On a Week"
+              title="Most Interest"
               value="2"
             ></v-stepper-item>
           </v-stepper-header>
 
           <v-stepper-window>
             <v-stepper-window-item value="1">
-              <v-radio-group v-model="periodOnDay">
-                <ChoiceBox
-                  v-for="data in timesData"
-                  :title="data.title"
-                  :option="data.option"
-                  :isFirst="data.title.toLowerCase() == 'casual'"
-                  :isLast="data.title.toLowerCase() == 'serious'"
-                  v-model:model-value="periodOnDay"
-                />
-              </v-radio-group>
+              <learn-reason
+                v-for="data in reasonsDatas"
+                :img="data.image"
+                :title="data.title"
+                :option="data.option"
+                v-model="whyLearnBool"
+              />
             </v-stepper-window-item>
             <v-stepper-window-item value="2">
-              <v-radio-group v-model="periodOnWeek">
-                <ChoiceBox
-                  v-for="data in daysData"
-                  :title="data.title"
-                  :option="data.option"
-                  :isFirst="data.title.toLowerCase() == 'a little'"
-                  :isLast="data.title.toLowerCase() == 'a lot'"
-                  v-model:model-value="periodOnWeek"
-                />
-              </v-radio-group>
+              <learn-reason
+                v-for="data in interestDatas"
+                :img="data.image"
+                :title="data.title"
+                :option="data.option"
+                v-model="interestBool"
+              />
             </v-stepper-window-item>
           </v-stepper-window>
 
@@ -142,7 +136,7 @@ const nextFunction = async (next) => {
 }
 
 :deep(.v-stepper-window) {
-  padding-bottom: 15px !important;
+  padding-bottom: 5px !important;
 }
 
 .step-divider {
@@ -158,13 +152,14 @@ const nextFunction = async (next) => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px !important;
   width: 100%;
-  min-height: 45vh;
+  min-height: 65vh;
 }
 
 .logo-text {
   font-size: 1.4rem;
   font-weight: 300;
   color: white;
+  padding: 0 1em;
   margin: 0 auto;
   letter-spacing: 2px;
 }

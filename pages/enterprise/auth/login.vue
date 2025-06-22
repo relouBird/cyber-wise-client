@@ -1,4 +1,7 @@
 <script setup>
+import * as yup from "yup";
+import useAuthStore from "~/stores/auth.store";
+
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
@@ -7,50 +10,55 @@ definePageMeta({
 
 // Meta tags
 useHead({
-  title: "Mot de passe oublié ? - SafeSteps",
+  title: "Connexion Entreprise - SafeSteps",
   meta: [
-    { name: "description", content: "Retrouvez votre mot de passe maintenant" },
+    { name: "description", content: "Connectez-vous à votre compte SafeSteps" },
   ],
 });
 
-// Variables réactives
+const authStore = useAuthStore();
+const store = storeToRefs(authStore);
 
-// Variables réactives
-const email = ref("");
-const loading = ref(false);
-const otpState = ref("step1");
-const otpValue = ref("");
+// Creer un formulaire reactif
+const form = useForm(
+  yup.object().shape({
+    email: yup.string().email(),
+    password: yup.string().min(6, "Password is too weak").required(),
+  }),
+  {
+    email: store.identifier.value ?? "",
+    password: "",
+  }
+);
 
-// mot de passe
-const password = ref("");
-const confirmpassword = ref("");
 const showPassword = ref(false);
+const loading = ref(false);
 
 // Méthodes
 const handleLogin = async () => {
   loading.value = true;
+
   try {
-    // Simulation d'une connexion
-    if (otpState.value == "step1") {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Ici vous ajouteriez votre logique de connexion
-      console.log("Email à verifier :", email.value);
-      otpState.value = "step2";
-    } else if (otpState.value == "step2") {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Ici vous ajouteriez votre logique de connexion
-      console.log("OTP à verifier :", otpValue.value);
-      otpState.value = "step3";
-    } else {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-    }
-    // Redirection après connexion réussie
-    // await navigateTo("/dashboard");
+    await form.submit(async () => await authStore.login(form.data));
+
+    form.clear();
+    form.data.password = "";
+    loading.value = false;
   } catch (error) {
     console.error("Erreur de connexion:", error);
   } finally {
     loading.value = false;
   }
+};
+
+const loginWithGoogle = () => {
+  console.log("Connexion avec Google");
+  // Logique de connexion Google
+};
+
+const loginWithFacebook = () => {
+  console.log("Connexion avec Facebook");
+  // Logique de connexion Facebook
 };
 </script>
 
@@ -58,22 +66,24 @@ const handleLogin = async () => {
   <v-card class="login-card" elevation="0">
     <v-card-text class="text-center pa-6">
       <!-- Logo -->
-      <div class="logo-section mb-0">
+      <div class="logo-section mb-2">
         <div class="logo-square">
-          <img src="~/assets/images/image1.png" alt="">
+          <img src="~/assets/images/image1.png" alt="" />
         </div>
         <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
       </div>
 
       <!-- Titre de bienvenue -->
-      <h2 class="welcome-title mb-2">Forgot password</h2>
+      <h2 class="welcome-title mb-4">Welcome back!</h2>
 
       <!-- Formulaire -->
       <v-form @submit.prevent="handleLogin">
-        <div v-if="otpState == 'step1'" class="">
+        <div class="">
           <label class="form-label">Email</label>
           <v-text-field
-            v-model="email"
+            v-model="form.data.email"
+            :error-messages="form.errors.email"
+            @change="form.validateField('email')"
             type="email"
             placeholder="Your e-mail"
             variant="outlined"
@@ -83,68 +93,82 @@ const handleLogin = async () => {
           ></v-text-field>
         </div>
 
-        <div v-if="otpState == 'step2'">
-          <v-otp-input
-            type="number"
-            v-model="otpValue"
-            max-width="360px"
-            class="mb-2"
-            height="80px"
-            length="6"
-            rounded="md"
-            :height="undefined"
-          />
-        </div>
-
-        <div v-if="otpState == 'step3'">
-          <div class="">
-            <label class="form-label">Password</label>
-            <v-text-field
-              v-model="password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="Your New password"
-              variant="outlined"
-              class="custom-input"
-              required
-              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
-            ></v-text-field>
-          </div>
-
-          <div class="">
-            <label class="form-label">Confirm Password</label>
-            <v-text-field
-              v-model="confirmpassword"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="Confirm Your password"
-              variant="outlined"
-              class="custom-input"
-              required
-              :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
-            ></v-text-field>
-          </div>
+        <div class="">
+          <label class="form-label">Password</label>
+          <v-text-field
+            :error-messages="form.errors.password"
+            v-model="form.data.password"
+            @change="form.validateField('password')"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Your password"
+            variant="outlined"
+            class="custom-input"
+            required
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="showPassword = !showPassword"
+          ></v-text-field>
         </div>
 
         <!-- Bouton de connexion -->
-        <v-btn type="submit" class="login-btn mb-6" block :loading="loading">
-          {{
-            otpState == "step1"
-              ? "Verify Now"
-              : otpState == "step2"
-              ? "Verify OTP"
-              : "Change Password"
-          }}
+        <v-btn
+          type="submit"
+          class="login-btn mb-6"
+          block
+          :disabled="
+            form.isInValid instanceof Object
+              ? form.isInValid.value
+              : form.isInValid ||
+                (form.processing instanceof Object
+                  ? form.processing.value
+                  : form.processing)
+          "
+          :loading="loading"
+        >
+          Log in
         </v-btn>
       </v-form>
 
+      <!-- Connexion sociale -->
+      <div class="social-login mb-8">
+        <v-row no-gutters class="ga-3">
+          <v-col>
+            <v-btn
+              variant="outlined"
+              class="social-btn"
+              block
+              size="large"
+              @click="loginWithGoogle"
+            >
+              <v-icon start>mdi-google</v-icon>
+              Google
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              variant="outlined"
+              class="social-btn"
+              block
+              size="large"
+              @click="loginWithFacebook"
+            >
+              <v-icon start>mdi-facebook</v-icon>
+              Facebook
+            </v-btn>
+          </v-col>
+        </v-row>
+      </div>
+
       <!-- Liens utiles -->
       <div class="auth-links">
-        <!-- Liens utiles -->
         <p class="mb-2">
-          ALready have account ?
-          <nuxt-link to="/auth/login" class="auth-link">connect now</nuxt-link>
+          Don't have an account?
+          <nuxt-link to="/enterprise/auth/register" class="auth-link"
+            >Create an account</nuxt-link
+          >
         </p>
+        <nuxt-link to="/enterprise/auth/forgot-password" class="auth-link">
+          Reset your password
+        </nuxt-link>
       </div>
     </v-card-text>
   </v-card>
@@ -172,7 +196,7 @@ const handleLogin = async () => {
   border-radius: 12px;
 }
 
-.logo-square img{
+.logo-square img {
   width: 100%;
   height: auto;
   transform: scale(290%);

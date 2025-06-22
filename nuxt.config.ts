@@ -5,6 +5,10 @@ export default defineNuxtConfig({
     transpile: ["vuetify"],
   },
 
+  nitro: {
+    compatibilityDate: "2025-06-16",
+  },
+
   modules: [
     "@pinia/nuxt",
     (_options, nuxt) => {
@@ -21,6 +25,13 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    optimizeDeps: {
+      include: ["pinia-plugin-persistedstate"],
+    },
+  },
+
+  pinia: {
+    storesDirs: ['./stores/**'], // Chemin vers vos stores
   },
 
   app: {

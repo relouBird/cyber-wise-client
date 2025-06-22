@@ -1,7 +1,7 @@
 import axios, { AxiosError, type AxiosResponse } from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { notify } from "~/helpers/notifications";
-import { authAddToken } from "~/helpers/request_axios";
+import useAuthStore from "~/stores/auth.store";
 import type { ErrorBackend } from "~/types/error.type";
 
 export default function axiosBuilder() {
@@ -28,10 +28,10 @@ export default function axiosBuilder() {
     }
 
     if (!config.url?.includes("auth")) {
-      const token = authAddToken();
-      console.log("token =>", token?.slice(0, 10));
+      const authStore = useAuthStore();
+      console.log("token =>", authStore.access_token?.slice(0, 10));
       config.headers["Access-Control-Allow-Origin"] = "*";
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${authStore.access_token}`;
     }
 
     console.log(`[${requestId}] api-request send -->`, config);
