@@ -24,7 +24,7 @@ const useAuthStore = defineStore("auth-store", {
   state: () =>
     <StateProps>{
       identifier: "",
-      type: "employee",
+      type: "Employé",
       access_token: null,
       refresh_token: null,
       expired_at: null,
@@ -49,7 +49,7 @@ const useAuthStore = defineStore("auth-store", {
         this.refresh_token = data.data.session.refresh_token;
         this.expired_at = data.data.session.expires_at * 1000;
         this.type = data.type;
-        if (this.type == "employee") {
+        if (this.type != "enterprise") {
           return navigateTo("/");
         } else {
           return navigateTo("/enterprise");
@@ -76,7 +76,7 @@ const useAuthStore = defineStore("auth-store", {
         this.expired_at = data.data.session.expires_at * 1000;
         this.type = data.type;
         this.is_configuring = true;
-        await navigateTo("/configuration/first-step");
+        await navigateTo("/enterprise/configuration/first-step");
       } else if (response.status == 500) {
         console.log("error =>", response.data);
       }
@@ -88,6 +88,8 @@ const useAuthStore = defineStore("auth-store", {
 
     async SecondStepConfiguring(desc: string) {
       this.is_configuring = false;
+
+      return navigateTo("/enterprise");
     },
 
     signOut() {

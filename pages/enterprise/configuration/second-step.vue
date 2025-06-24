@@ -1,10 +1,11 @@
 <script setup>
 import { times, days } from "~/constants/configuration.constant";
+import useAuthStore from "~/stores/auth.store";
 
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
-  middleware: ["auth","user"],
+  middleware: ["auth", "user"],
 });
 
 // Meta tags
@@ -12,6 +13,9 @@ useHead({
   title: "Configuration - SafeSteps",
   meta: [{ name: "description", content: "Configurer votre espace" }],
 });
+
+// declaration de la store...
+const authStore = useAuthStore();
 
 const periodOnDay = ref("");
 const periodOnWeek = ref("");
@@ -30,9 +34,9 @@ const previousFunction = (prev) => {
   console.log("step =>", step.value);
 };
 
-const nextFunction = async (next) => {
+const nextFunction = (next) => {
   if (periodOnWeek.value != "" && step.value == 1) {
-    await navigateTo("/enterprise");
+    authStore.SecondStepConfiguring();
   } else if (periodOnDay.value != "" && step.value == 0) {
     next();
     step.value++;

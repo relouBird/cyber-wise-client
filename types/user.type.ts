@@ -1,3 +1,5 @@
+import type { RoleType } from "./constant.type";
+
 export type LoginCredentialType = {
   email: string;
   password: string | null;
@@ -62,7 +64,7 @@ export type UserData = {
   session: Session;
 };
 
-export type UserType = "employee" | "enterprise"
+export type UserType = RoleType | "enterprise"
 
 export type UserResponse = {
   message : string;

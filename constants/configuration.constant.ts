@@ -1,4 +1,4 @@
-import type { ConfigurationInterface } from "~/types/configuration.type";
+import type { ConfigurationInterface } from "~/types/constant.type";
 import IMG1 from "~/assets/images/image1.png";
 import CHOICE1 from "~/assets/images/configuration/dossier.png";
 import CHOICE2 from "~/assets/images/configuration/alert.png";
