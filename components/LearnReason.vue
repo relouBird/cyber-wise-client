@@ -23,18 +23,18 @@ const handleClick = () => {
   <div
     v-if="!(modelValue == option)"
     @click="handleClick"
-    class="box-part w-100 rounded-lg bg-surface d-flex justify-start align-center ga-3 ps-2 mb-4"
+    class="box-part w-100 rounded-lg bg-surface d-flex justify-start align-center ga-3 ps-2 py-3 mb-4"
   >
-    <img class="" width="70" :src="img" :alt="img" />
+    <img class="" width="55" :src="img" :alt="img" />
     <p class="par">{{ title }}</p>
   </div>
 
   <div
     v-if="modelValue == option"
     @click="handleClick"
-    class="box-part active w-100 rounded-lg bg-surface d-flex justify-start align-center ga-3 ps-2 mb-4"
+    class="box-part active w-100 rounded-lg bg-surface d-flex justify-start align-center ga-3 ps-2 py-3 mb-4"
   >
-    <img class="" width="70" :src="img" :alt="img" />
+    <img class="" width="55" :src="img" :alt="img" />
     <p class="par">{{ title }}</p>
   </div>
 </template>

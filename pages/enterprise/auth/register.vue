@@ -1,7 +1,11 @@
 <script setup>
+import * as yup from "yup";
+import useAuthStore from "~/stores/auth.store";
+
 // Définir le layout à utiliser
 definePageMeta({
   layout: "auth",
+  middleware: "auth-default"
 });
 
 // Meta tags
@@ -10,13 +14,37 @@ useHead({
   meta: [{ name: "description", content: "Enregistrez-vous sur SafeSteps" }],
 });
 
-// Variables réactives
+const authStore = useAuthStore();
+const store = storeToRefs(authStore);
 
 // Variables réactives
-const email = ref("");
-const password = ref("");
 const showPassword = ref(false);
 const loading = ref(false);
+
+// 🔹 Créer un formulaire réactif
+const form = useForm(
+  // Schéma de validation Yup
+  yup.object().shape({
+    email: yup.string().email(),
+    password: yup
+      .string()
+      .min(6, "Password is too weak")
+      .matches(
+        /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/,
+        "Password must contains letters and numbers"
+      )
+      .required("Password is required"),
+    password_confirmation: yup
+      .string()
+      .required()
+      .oneOf([yup.ref("password")], "Not corresponding"),
+  }),
+  {
+    email: store.identifier.value ?? "",
+    password: "",
+    password_confirmation: "",
+  }
+);
 
 const signWithCredentials = ref(false);
 
@@ -25,21 +53,18 @@ const handleLogin = async () => {
   loading.value = true;
 
   try {
-    // Simulation d'une connexion
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const response = await form.submit(
+      async () => await authStore.register(form.data)
+    );
 
-    // Ici vous ajouteriez votre logique de connexion
-    console.log("Login avec:", {
-      email: email.value,
-      password: password.value,
-    });
-
-    // Redirection après connexion réussie
-    await navigateTo("/configuration/first-step");
-  } catch (error) {
-    console.error("Erreur de connexion:", error);
-  } finally {
+    form.clear();
+    form.data.password = "";
+    form.data.password_confirmation = "";
     loading.value = false;
+  } catch (error) {
+    console.log(error);
+    loading.value = false;
+  } finally {
   }
 };
 
@@ -57,6 +82,10 @@ const loginWithFacebook = () => {
   console.log("Connexion avec Facebook");
   // Logique de connexion Facebook
 };
+
+watch(form.data, () => {
+  console.log("data =>", form.data);
+});
 </script>
 
 <template>
@@ -73,23 +102,36 @@ const loginWithFacebook = () => {
     </v-btn>
     <v-card-text class="text-center pa-6">
       <!-- Logo -->
-      <div :class="'logo-section', signWithCredentials == false ? ' mb-2': ' mb-0'">
-      <!-- <div :class=" 'logo-section' + signWithCredentials == false ? ' mb-2': ' mb-0'"> -->
+      <div v-if="!signWithCredentials" class="logo-section mb-2">
         <div class="logo-square">
-          <img src="~/assets/images/image1.png" alt="">
+          <img src="~/assets/images/image1.png" alt="" />
+        </div>
+        <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
+      </div>
+      <div v-if="signWithCredentials" class="logo-section mb-0">
+        <div class="logo-square">
+          <img src="~/assets/images/image1.png" alt="" />
         </div>
         <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
       </div>
 
       <!-- Titre de bienvenue -->
-      <h2 :class="signWithCredentials == false ? ' mb-7': ' mb-2' + 'welcome-title'">Register Now !</h2>
+      <h2
+        :class="
+          signWithCredentials == false ? ' mb-7' : ' mb-2' + 'welcome-title'
+        "
+      >
+        Register Now !
+      </h2>
 
       <!-- Formulaire -->
       <v-form v-if="signWithCredentials" @submit.prevent="handleLogin">
         <div class="">
           <label class="form-label">Email</label>
           <v-text-field
-            v-model="email"
+            v-model="form.data.email"
+            :error-messages="form.errors.email"
+            @change="form.validateField('email')"
             type="email"
             placeholder="Your e-mail"
             variant="outlined"
@@ -102,9 +144,11 @@ const loginWithFacebook = () => {
         <div class="">
           <label class="form-label">Password</label>
           <v-text-field
-            v-model="password"
             :type="showPassword ? 'text' : 'password'"
             placeholder="Your password"
+            :error-messages="form.errors.password"
+            v-model="form.data.password"
+            @change="form.validateField('password')"
             variant="outlined"
             class="custom-input"
             required
@@ -116,9 +160,11 @@ const loginWithFacebook = () => {
         <div class="">
           <label class="form-label">Confirm Password</label>
           <v-text-field
-            v-model="password"
             :type="showPassword ? 'text' : 'password'"
             placeholder="Confirm Your password"
+            :error-messages="form.errors.password_confirmation"
+            v-model="form.data.password_confirmation"
+            @change="form.validateField('password_confirmation')"
             variant="outlined"
             class="custom-input"
             required
@@ -127,8 +173,21 @@ const loginWithFacebook = () => {
           ></v-text-field>
         </div>
 
-        <v-btn type="submit" class="login-btn mb-6" block :loading="loading">
-          Log in
+        <v-btn
+          type="submit"
+          class="login-btn mb-6"
+          block
+          :disabled="
+            (form.isInValid instanceof Object
+              ? form.isInValid.value
+              : form.isInValid) ||
+            (form.processing instanceof Object
+              ? form.processing.value
+              : form.processing)
+          "
+          :loading="loading"
+        >
+          Sign Up for Free
         </v-btn>
       </v-form>
 
@@ -182,8 +241,11 @@ const loginWithFacebook = () => {
       <div class="auth-links">
         <p class="mb-2">
           ALready have account ?
-          <nuxt-link to="/auth/login" class="auth-link">connect now</nuxt-link>
+          <nuxt-link to="/enterprise/auth/login" class="auth-link">connect now</nuxt-link>
         </p>
+        <nuxt-link to="/auth/login" class="auth-link">
+          Connect as employee
+        </nuxt-link>
       </div>
     </v-card-text>
   </v-card>
@@ -218,7 +280,7 @@ const loginWithFacebook = () => {
   border-radius: 12px;
 }
 
-.logo-square img{
+.logo-square img {
   width: 100%;
   height: auto;
   transform: scale(290%);

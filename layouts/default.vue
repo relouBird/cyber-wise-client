@@ -1,5 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import useAuthStore from "~/stores/auth.store";
+
+const authStore = useAuthStore();
+const route = useRoute();
 
 // État de la sidebar mobile
 const drawer = ref(false);
@@ -8,8 +11,8 @@ const drawer = ref(false);
 const navigationItems = [
   { title: "Accueil", to: "/", icon: "mdi-home" },
   { title: "Cours", to: "/courses", icon: "mdi-school" },
-  { title: "Projets", to: "/projects", icon: "mdi-folder-multiple" },
-  { title: "Communauté", to: "/community", icon: "mdi-account-group" },
+  { title: "Practice", to: "/projects", icon: "mdi-folder-multiple" },
+  { title: "Profile", to: "/profile", icon: "mdi-account" },
 ];
 
 // Notifications (exemple)
@@ -31,34 +34,32 @@ const userActions = [
   { title: "Déconnexion", icon: "mdi-logout", action: handleLogout },
 ];
 
-// Liens du footer
-const footerLinks = [
-  { title: "À propos", to: "/about" },
-  { title: "Contact", to: "/contact" },
-  { title: "Confidentialité", to: "/privacy" },
-  { title: "Conditions", to: "/terms" },
-];
-
 // Année courante
 const currentYear = new Date().getFullYear();
 
 // Fonction de déconnexion
-function handleLogout() {
-  // Logique de déconnexion
-  console.log("Déconnexion...");
-  // Redirection vers login
-  navigateTo("/auth/login");
+async function handleLogout() {
+  // ceci appelle auth et le deconnecte
+  await authStore.signOut();
 }
 </script>
 
 <template>
-  <v-app>
+  <v-app class="admin-layout">
+    <!-- Background avec les formes géométriques -->
+    <div class="background-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+
     <!-- Navigation principale -->
     <v-app-bar
       :elevation="2"
       color="primary"
       density="comfortable"
-      class="main-header"
+      class="main-header px-2"
     >
       <template v-slot:prepend>
         <v-app-bar-nav-icon
@@ -71,8 +72,12 @@ function handleLogout() {
       <!-- Logo -->
       <nuxt-link to="/" class="logo-link">
         <div class="logo-container">
-          <div class="logo-square-small"></div>
-          <span class="logo-text-small">mimo</span>
+          <div class="logo-square-small">
+            <img src="~/assets/images/image1.png" alt="" />
+          </div>
+          <span class="logo-text-small font-manrope font-manrope-400">
+            SafeSteps
+          </span>
         </div>
       </nuxt-link>
 
@@ -80,16 +85,30 @@ function handleLogout() {
 
       <!-- Navigation desktop -->
       <div class="d-none d-lg-flex align-center">
-        <v-btn
-          v-for="item in navigationItems"
-          :key="item.title"
-          :to="item.to"
-          variant="text"
-          class="nav-btn"
-        >
-          <v-icon start>{{ item.icon }}</v-icon>
-          {{ item.title }}
-        </v-btn>
+        <div v-for="item in navigationItems">
+          <v-btn
+            :key="item.title"
+            :to="item.to"
+            color="primary"
+            variant="text"
+            class="nav-btn"
+            v-if="route.path == item.to"
+          >
+            <v-icon start>{{ item.icon }}</v-icon>
+            {{ item.title }}
+          </v-btn>
+
+          <v-btn
+            :key="item.icon"
+            :to="item.to"
+            variant="text"
+            class="nav-btn"
+            v-else
+          >
+            <v-icon start>{{ item.icon }}</v-icon>
+            {{ item.title }}
+          </v-btn>
+        </div>
       </div>
 
       <v-spacer></v-spacer>
@@ -115,16 +134,16 @@ function handleLogout() {
               </v-avatar>
             </v-btn>
           </template>
-          <v-list>
+          <v-list class="bg-fontcolor">
             <v-list-item
               v-for="action in userActions"
               :key="action.title"
               @click="action.action"
             >
-              <template v-slot:prepend>
-                <v-icon>{{ action.icon }}</v-icon>
-              </template>
-              <v-list-item-title>{{ action.title }}</v-list-item-title>
+              <v-list-item-title class="d-flex align-center"
+                ><v-icon>{{ action.icon }}</v-icon>
+                <p class="pt-1 pl-3">{{ action.title }}</p></v-list-item-title
+              >
             </v-list-item>
           </v-list>
         </v-menu>
@@ -161,26 +180,20 @@ function handleLogout() {
         <v-row align="center">
           <v-col cols="12" md="6">
             <div class="footer-logo">
-              <div class="logo-square-small"></div>
-              <span class="logo-text-small">mimo</span>
+              <div class="logo-square-small">
+                <img src="~/assets/images/image1.png" alt="" />
+              </div>
+              <span class="logo-text-small font-manrope font-manrope-400"
+                >SafeSteps</span
+              >
             </div>
             <p class="footer-text mt-2">
               Plateforme d'apprentissage moderne pour apprentis en hacking
             </p>
           </v-col>
           <v-col cols="12" md="6" class="text-md-right">
-            <!-- <div class="footer-links">
-              <nuxt-link
-                v-for="link in footerLinks"
-                :key="link.title"
-                :to="link.to"
-                class="footer-link"
-              >
-                {{ link.title }}
-              </nuxt-link>
-            </div> -->
             <p class="footer-copyright mt-3">
-              &copy; {{ currentYear }} Mimo. Tous droits réservés.
+              &copy; {{ currentYear }} SafeSteps. Tous droits réservés.
             </p>
           </v-col>
         </v-row>
@@ -190,8 +203,95 @@ function handleLogout() {
 </template>
 
 <style scoped>
+.admin-layout {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+  min-height: 100vh;
+  position: relative;
+}
+
+.background-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.background-shapes .shape {
+  position: absolute;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(233, 30, 99, 0.1),
+    rgba(156, 39, 176, 0.1)
+  );
+  backdrop-filter: blur(20px);
+}
+
+.shape.shape-1 {
+  width: 200px;
+  height: 200px;
+  top: 10%;
+  right: 10%;
+  transform: rotate(45deg);
+  background: linear-gradient(
+    135deg,
+    rgba(233, 30, 99, 0.15),
+    rgba(156, 39, 176, 0.1)
+  );
+  z-index: -1;
+}
+
+.shape.shape-2 {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  left: 5%;
+  transform: rotate(-30deg);
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1),
+    rgba(33, 150, 243, 0.1)
+  );
+  z-index: -1;
+}
+
+.shape.shape-3 {
+  width: 180px;
+  height: 180px;
+  top: 50%;
+  right: 5%;
+  transform: rotate(15deg);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 193, 7, 0.1),
+    rgba(255, 152, 0, 0.1)
+  );
+  z-index: -1;
+}
+
+.shape.shape-4 {
+  width: 120px;
+  height: 120px;
+  bottom: 10%;
+  right: 30%;
+  transform: rotate(-45deg);
+  background: linear-gradient(
+    135deg,
+    rgba(156, 39, 176, 0.1),
+    rgba(63, 81, 181, 0.1)
+  );
+  z-index: -1;
+}
+
 .main-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(26, 26, 46, 0.85) !important;
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-link {
@@ -206,10 +306,15 @@ function handleLogout() {
 }
 
 .logo-square-small {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #ff6b9d, #ff8cc8);
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+}
+
+.logo-square-small img {
+  width: 100%;
+  height: auto;
+  transform: scale(200%);
 }
 
 .logo-text-small {
@@ -240,6 +345,7 @@ function handleLogout() {
 }
 
 .main-footer {
+  background: rgba(26, 26, 46, 0.85) !important;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding: 2rem 0;
 }

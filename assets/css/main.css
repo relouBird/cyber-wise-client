@@ -1,15 +1,28 @@
 /* Classes Manrope */
 .font-manrope,
 .manrope-font {
-  font-family: 'IBM Plex Mono','Manrope', sans-serif !important;
+  font-family: "IBM Plex Mono", "Manrope", Arial, Helvetica, sans-serif !important;
 }
 
 /* Variantes de poids */
-.font-manrope-200 { font-weight: 200 !important; }
-.font-manrope-300 { font-weight: 300 !important; }
-.font-manrope-400 { font-weight: 400 !important; }
-.font-manrope-500 { font-weight: 500 !important; }
-.font-manrope-600 { font-weight: 600 !important; }
-.font-manrope-700 { font-weight: 700 !important; }
-.font-manrope-800 { font-weight: 800 !important; }
-
+.font-manrope-200 {
+  font-weight: 200 !important;
+}
+.font-manrope-300 {
+  font-weight: 300 !important;
+}
+.font-manrope-400 {
+  font-weight: 400 !important;
+}
+.font-manrope-500 {
+  font-weight: 500 !important;
+}
+.font-manrope-600 {
+  font-weight: 600 !important;
+}
+.font-manrope-700 {
+  font-weight: 700 !important;
+}
+.font-manrope-800 {
+  font-weight: 800 !important;
+}
