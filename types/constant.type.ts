@@ -6,7 +6,7 @@ export interface ConfigurationInterface {
 export interface MenuItem {
   title: string;
   icon: string;
-  to: string;
+  to?: string;
   badge?: {
     text: string;
     color: string;

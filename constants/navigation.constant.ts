@@ -1,6 +1,6 @@
 import type { MenuItem } from "~/types/constant.type";
 
-export const menuItemsConstants = [
+export const menuItemsConstants : MenuItem[] = [
   {
     title: 'Dashboard',
     icon: 'mdi-view-dashboard-outline',

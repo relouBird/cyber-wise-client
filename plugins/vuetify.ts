@@ -25,6 +25,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             primary: "rgb(255,107,157)",
             secondary: "#764ba2",
             fontcolor:"rgba(26,26,46,0.25)",
+            fontcolorSecond:"#1a1a2e",
             accent: "#ff6b9d",
             error: "#ff5252",
             info: "#2196f3",

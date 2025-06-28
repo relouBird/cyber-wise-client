@@ -11,6 +11,7 @@ import type {
 type StateProps = {
   identifier: string;
   type: UserType;
+  me: User | null;
   access_token: string | null;
   refresh_token: string | null;
   expired_at: number | null;
@@ -25,6 +26,7 @@ const useAuthStore = defineStore("auth-store", {
     <StateProps>{
       identifier: "",
       type: "Employé",
+      me: null,
       access_token: null,
       refresh_token: null,
       expired_at: null,
@@ -49,6 +51,7 @@ const useAuthStore = defineStore("auth-store", {
         this.refresh_token = data.data.session.refresh_token;
         this.expired_at = data.data.session.expires_at * 1000;
         this.type = data.type;
+        this.me = data.data.user;
         if (this.type != "enterprise") {
           return navigateTo("/");
         } else {
@@ -75,6 +78,7 @@ const useAuthStore = defineStore("auth-store", {
         this.refresh_token = data.data.session.refresh_token;
         this.expired_at = data.data.session.expires_at * 1000;
         this.type = data.type;
+        this.me = data.data.user;
         this.is_configuring = true;
         await navigateTo("/enterprise/configuration/first-step");
       } else if (response.status == 500) {

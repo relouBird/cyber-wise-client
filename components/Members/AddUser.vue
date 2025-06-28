@@ -80,7 +80,7 @@ watch(
   () => props.modelCurrentUserValue,
   (newValue) => {
     console.log("new-data =>", newValue);
-    currentUser.value = { ...(newValue as UserProps) };
+    currentUser.value = { ...(newValue as   UserProps) };
     console.log(
       "identique =>",
       !areObjectsDifferent(currentUser.value, props.modelCurrentUserValue)

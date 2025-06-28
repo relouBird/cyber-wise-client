@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { MembersDeleteUser } from "#components";
 import { usersRole } from "~/constants/users.constant";
+import { formatDateFirstType, formatDateSecondType } from "~/helpers/utils";
 import useUsersStore from "~/stores/users.store";
 import type { RoleType, UserProps } from "~/types/constant.type";
 
@@ -95,16 +96,6 @@ const getRoleColor = (role: string) => {
     Invité: "info",
   };
   return colors[role] || "default";
-};
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 };
 
 const resetFilters = () => {
@@ -246,7 +237,6 @@ onUpdated(async () => {
               label="Filtrer par statut"
               variant="outlined"
               density="compact"
-              class="custom-select-menu"
               hide-details
             >
               <template #prepend-item>
@@ -328,7 +318,7 @@ onUpdated(async () => {
         <template #item.lastLogin="{ item }">
           <span class="text-body-2 text-center">{{
             item.lastLogin != undefined
-              ? formatDate(item.lastLogin)
+              ? formatDateSecondType(item.lastLogin)
               : "Premiere connexion"
           }}</span>
         </template>

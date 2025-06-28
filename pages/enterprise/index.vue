@@ -4,6 +4,7 @@ import {
   rapidActions,
   recaps,
 } from "~/constants/dashboard.constant";
+import useTrainingsStore from "~/stores/trainings.store";
 import useUsersStore from "~/stores/users.store";
 import type {
   Stats,
@@ -25,7 +26,9 @@ useHead({
 });
 
 const useUsers = useUsersStore();
-const store = storeToRefs(useUsers);
+const useTrainings = useTrainingsStore();
+const storeUsers = storeToRefs(useUsers);
+const storeTrainings = storeToRefs(useTrainings);
 
 // Données réactives
 const stats = reactive<Statistics[]>(recaps);
@@ -35,8 +38,12 @@ const recentActivities = ref<Activity[]>(activities);
 // Simulation de chargement des statistiques (à remplacer par votre API)
 onMounted(async () => {
   try {
-    const data = ref<number>(store.getLength.value);
-    stats[0].number = data.value;
+    const dataTrainings = ref<number>(storeTrainings.getTrainings.value.length);
+    const dataUsers = ref<number>(storeUsers.getLength.value);
+
+    // positionnnement...
+    stats[0].number = dataUsers.value;
+    stats[1].number = dataTrainings.value;
   } catch (error) {
     console.error("Erreur lors du chargement des statistiques:", error);
   }

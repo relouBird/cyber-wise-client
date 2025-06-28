@@ -27,10 +27,13 @@ export default function axiosBuilder() {
       config.headers["x-request-id"] = requestId;
     }
 
+    if (config.headers && config.headers["Content-Type"]) {
+      delete config.headers["Content-Type"];
+    }
+
     if (!config.url?.includes("auth")) {
       const authStore = useAuthStore();
-      console.log("token =>", authStore.access_token?.slice(0, 10));
-      config.headers["Access-Control-Allow-Origin"] = "*";
+      // console.log("token =>", authStore.access_token?.slice(0, 10));
       config.headers["Authorization"] = `Bearer ${authStore.access_token}`;
     }
 
