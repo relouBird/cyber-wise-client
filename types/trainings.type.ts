@@ -1,4 +1,6 @@
 // Types
+export type LevelType = "beginner" | "intermediate" | "advanced";
+
 export interface Domain {
   id?: number;
   creator_id?: string;
@@ -10,10 +12,12 @@ export interface Domain {
 }
 
 export interface Course {
-  id: number;
+  id?: number;
+  formation_id: number;
+  creator_id?: string;
   title: string;
   content: string;
-  image?: string;
+  image?: string | File;
   order: number;
 }
 
@@ -22,6 +26,7 @@ export interface Formation {
   creator_id?: string;
   categorie: string;
   color?: string;
+  level: LevelType;
   title: string;
   description: string;
   domainId: number;
@@ -55,6 +60,12 @@ export interface DomainDeleteResponse {
   message: string;
   data: Domain;
   formationListDeleted: Formation[];
+}
+
+export interface TrainingDeleteResponse {
+  message: string;
+  data: Formation;
+  coursesListDeleted: Formation[];
 }
 
 export interface TrainingsResponse {

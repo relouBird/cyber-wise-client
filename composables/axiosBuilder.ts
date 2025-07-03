@@ -64,7 +64,11 @@ export default function axiosBuilder() {
       // Ceci envoie la notification directement dans le store de notifications mais àa partir du helpers
       notify({
         color: "error",
-        message: errorParticularity.details,
+        message: errorParticularity.details
+          ? errorParticularity.details
+          : errorParticularity.error
+          ? errorParticularity.error
+          : "Nothing to Handle...",
         visible: true,
       });
 

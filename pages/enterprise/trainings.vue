@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { TrainingsNotDeleted } from "#components";
 import { formatDateFirstType, formatDateSecondType } from "~/helpers/utils";
+import useAuthStore from "~/stores/auth.store";
+import useCoursesStore from "~/stores/courses.store";
 import useTrainingsStore from "~/stores/trainings.store";
 import type { Domain, Formation } from "~/types/trainings.type";
 
@@ -18,6 +20,8 @@ useHead({
 
 // store
 const trainingsStore = useTrainingsStore();
+const coursesStore = useCoursesStore();
+const { me } = useAuthStore();
 
 // État réactif
 const selectedDomain = ref<Domain | null>(null);
@@ -28,6 +32,7 @@ const selectedStatus = ref<boolean | null>(null);
 const domainDialog = ref(false);
 const formationDialog = ref(false);
 const dialogDelete = ref("");
+const dialogConfirmDelete = ref<string>();
 
 // Formulaires
 const domainForm = ref<Domain>({
@@ -42,6 +47,7 @@ const formationForm = ref<Formation>({
   title: "",
   categorie: "",
   description: "",
+  level: "beginner",
   image: "",
   domainId: 1,
   active: false,
@@ -124,6 +130,7 @@ const openFormationDialog = () => {
   formationForm.value = {
     title: "",
     categorie: "",
+    level: "beginner",
     description: "",
     image: "",
     domainId: selectedDomain.value?.id ?? 1,
@@ -153,18 +160,31 @@ const editFormation = (formation: Formation) => {
 
 const viewFormation = (formation: Formation) => {
   // Navigation vers la gestion des cours
+  coursesStore.setActiveTraining(formation.id ?? 1);
+  coursesStore.setNameTraining(formation.title);
+  coursesStore.getFormationCourses(formation.id ?? 1);
+
   console.log("Voir les cours de:", formation.title);
-  // Ici vous pourriez naviguer vers une page de gestion des cours
+  navigateTo("/enterprise/courses"); // Ici nous allons naviguer vers une page de gestion des cours
 };
 
-const toggleFormationStatus = (formation: Formation) => {
+const toggleFormationStatus = async (formation: Formation) => {
   formation.active = !formation.active;
+
+  await trainingsStore.updateTraining(me?.id ?? "", formation, true);
 };
 
 const deleteDomain = async (domain: Domain) => {
   if (domain.creator_id) {
     // Supprimer les formations du domaine
-    await trainingsStore.deleteDomain(domain.id ?? 1);
+    dialogConfirmDelete.value = "Domain";
+    trainingsStore.setDelete(domain);
+    console.log(
+      "creator_id =>",
+      domain.creator_id,
+      " with type to =>",
+      dialogConfirmDelete.value
+    );
   } else {
     // Afficher que ce domain ne peut etre supprimé...
     dialogDelete.value = "Domain";
@@ -175,7 +195,9 @@ const deleteFormation = async (formation: Formation) => {
   if (!formation.creator_id) {
     dialogDelete.value = "Formation";
   } else {
-    await trainingsStore.deleteTraining(formation.id ?? 1);
+    // Supprimer les formations du domaine
+    dialogConfirmDelete.value = "Formation";
+    trainingsStore.setDelete(formation);
   }
 };
 
@@ -403,7 +425,7 @@ onUpdated(() => {
                 <!-- Image de la formation -->
                 <v-avatar size="80" rounded="lg" class="me-4 flex-shrink-0">
                   <v-img
-                    v-if="formation.image !=''"
+                    v-if="formation.image != ''"
                     :src="String(formation.image)"
                     cover
                   />
@@ -564,6 +586,9 @@ onUpdated(() => {
 
     <!-- Dialog qui permet d'afficher les blocus... -->
     <TrainingsNotDeleted v-model="dialogDelete" />
+
+    <!-- Ce bloc permet juste de confirmer ce que souhaite supprimer ou non -->
+    <TrainingsConfirmDelete v-model="dialogConfirmDelete" />
   </v-container>
 </template>
 

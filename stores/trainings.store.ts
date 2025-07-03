@@ -1,16 +1,14 @@
 import type { AxiosResponse } from "axios";
-import {
-  domainsConstants,
-  formationsConstants,
-} from "~/constants/trainings.constant";
 import { notify } from "~/helpers/notifications";
 import useTrainingService from "~/services/trainings.service";
 import type {
+  Course,
   Domain,
   DomainDeleteResponse,
   DomainResponse,
   DomainsResponse,
   Formation,
+  TrainingDeleteResponse,
   TrainingResponse,
   TrainingsResponse,
 } from "~/types/trainings.type";
@@ -18,6 +16,7 @@ import type {
 type StateProps = {
   domains_list: Domain[];
   training_list: Formation[];
+  toDelete: Domain | Formation | null;
 };
 
 const service = useTrainingService();
@@ -27,11 +26,13 @@ const useTrainingsStore = defineStore("trainings-store", {
     <StateProps>{
       domains_list: [],
       training_list: [],
+      toDelete: null,
     },
   persist: true,
   getters: {
     getDomains: (state) => state.domains_list,
     getTrainings: (state) => state.training_list,
+    getDelete: (state) => state.toDelete,
   },
   actions: {
     // Partie qui gere le domain....
@@ -89,10 +90,26 @@ const useTrainingsStore = defineStore("trainings-store", {
         const newDomain: Domain = {
           ...updateDomain,
         };
-        const index = this.domains_list.findIndex((u) => u.id == newDomain.id);
 
-        if (index !== -1) {
-          this.domains_list[index] = updateDomain;
+        const response: AxiosResponse = await service.updateDomain(
+          updateDomain.id,
+          newDomain
+        );
+
+        if (response.status == 200 || response.status == 201) {
+          let data = response.data as DomainResponse;
+          console.log("data =>", data);
+
+          const index = this.domains_list.findIndex(
+            (u) => u.id == data.data.id
+          );
+          if (index !== -1) {
+            this.domains_list[index] = updateDomain;
+          }
+        } else if (response.status == 404) {
+          console.log("error-not-found =>", response.data);
+        } else if (response.status == 500) {
+          console.log("error =>", response.data);
         }
       }
     },
@@ -123,16 +140,8 @@ const useTrainingsStore = defineStore("trainings-store", {
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as TrainingsResponse;
-        let newData: Formation[] = [];
-        for (let i = 0; i < data.data.length; i++) {
-          // let image = "";
-          // if (data.data[i].image) {
-          //   image = JSON.stringify(data.data[i].image);
-          // }
-          newData.push({ ...data.data[i], courses: [] });
-        }
-        console.log("data =>", newData);
-        this.training_list = newData;
+        console.log("data =>", data.data);
+        this.training_list = data.data;
       } else if (response.status == 404) {
         console.log("error =>", response.data);
       } else if (response.status == 500) {
@@ -143,50 +152,34 @@ const useTrainingsStore = defineStore("trainings-store", {
     },
 
     async createTraining(author_id: string, trainingForm: Formation) {
-      // Créer une nouvelle formation
-      const newFormation: Formation = {
-        creator_id: author_id,
-        categorie: "",
-        title: trainingForm.title,
-        image: trainingForm.image,
-        description: trainingForm.description,
-        domainId: trainingForm.domainId,
-        active: trainingForm.active,
-      };
-
-      const form = new FormData();
-      for (const key in newFormation) {
-        if (Object.prototype.hasOwnProperty.call(newFormation, key)) {
-          form.append(key, newFormation[key]);
-        }
-      }
-      // Objet JSON qu’on transforme en string avant d’ajouter
-      const imageMeta = {
-        alt: "Une image cool",
-        size: "medium",
-      };
-      form.append("imageMeta", JSON.stringify(imageMeta)); // ✅ ici c'est du JSON
-
-      newFormation.categorie =
+      let categorie =
         this.domains_list[
           this.domains_list.findIndex((u) => u.id == trainingForm.domainId)
         ].categorie;
 
-      newFormation.color =
+      let color =
         this.domains_list[
           this.domains_list.findIndex((u) => u.id == trainingForm.domainId)
         ].color;
 
-      console.log("Nouvelle formation - murel =>", newFormation);
-      console.log("Nouvelle formation - form =>", form);
+      let formData = new FormData();
 
-      const response: AxiosResponse = await service.createTraining(
-        form as unknown as Formation
-      );
+      formData.append("creator_id", author_id);
+      formData.append("categorie", categorie);
+      formData.append("color", color);
+      formData.append("level", trainingForm.level);
+      formData.append("title", trainingForm.title);
+      formData.append("image", trainingForm.image as File);
+      formData.append("description", trainingForm.description);
+      formData.append("domainId", String(trainingForm.domainId));
+      formData.append("active", String(trainingForm.active));
+
+      console.log("Nouvelle formation - murel =>", trainingForm);
+
+      const response: AxiosResponse = await service.createTraining(formData);
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as TrainingResponse;
-        console.log("data =>", data);
 
         this.training_list.push(data.data);
       } else if (response.status == 400) {
@@ -194,29 +187,94 @@ const useTrainingsStore = defineStore("trainings-store", {
       }
     },
 
-    async updateTraining(author_id: string, updateTraining: Formation) {
+    async updateTraining(
+      author_id: string,
+      updateTraining: Formation,
+      isActive?: boolean
+    ) {
       if (author_id != updateTraining.creator_id) {
         notify({
           color: "error",
           message: "You aren't able to modify this...",
           visible: true,
         });
-      } else {
         const index = this.training_list.findIndex(
-          (f) => f.id === updateTraining!.id
+          (u) => u.id == updateTraining.id
         );
-        this.training_list[index] = {
-          ...updateTraining,
-          title: updateTraining.title,
-          description: updateTraining.description,
-          image: updateTraining.image,
-        };
+        this.training_list[index] = isActive
+          ? { ...this.training_list[index], active: !this.training_list[index] }
+          : this.training_list[index];
+      } else {
+        let formData = new FormData();
+
+        formData.append("creator_id", updateTraining.creator_id);
+        formData.append("categorie", updateTraining.categorie);
+        formData.append("color", updateTraining.color ?? "");
+        formData.append("level", updateTraining.level);
+        formData.append("title", updateTraining.title);
+        if (
+          typeof updateTraining.image == "string" ||
+          typeof updateTraining.image == "undefined"
+        ) {
+          formData.append("image", String(updateTraining.image));
+        } else {
+          formData.append("image", updateTraining.image as File);
+        }
+
+        formData.append("description", updateTraining.description);
+        formData.append("domainId", String(updateTraining.domainId));
+        formData.append("active", String(updateTraining.active));
+
+        const response: AxiosResponse = await service.updateTraining(
+          updateTraining.id,
+          formData
+        );
+
+        if (response.status == 200 || response.status == 201) {
+          let data = response.data as TrainingResponse;
+          let product = { ...data.data };
+
+          const index = this.training_list.findIndex((u) => u.id == product.id);
+          if (index !== -1) {
+            this.training_list[index] = product;
+          }
+        } else if (response.status == 404) {
+          console.log("error-not-found =>", response.data);
+        } else if (response.status == 500) {
+          console.log("error =>", response.data);
+        }
       }
     },
 
     async deleteTraining(trainingId: number) {
-      const index = this.training_list.findIndex((f) => f.id === trainingId);
-      this.training_list.splice(index, 1);
+      const response: AxiosResponse =
+        service.deleteTraining && (await service.deleteTraining(trainingId));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as TrainingDeleteResponse;
+
+        console.log("data-training-deleted =>", data.data);
+
+        // Supprimer le domaine
+        const index = this.training_list.findIndex(
+          (d) => d.id === data.data.id
+        );
+        this.training_list.splice(index, 1);
+      } else if (response.status == 500) {
+        console.log("error =>", response.data.message);
+      }
+    },
+
+    setDelete(toDelete: Domain | Formation) {
+      this.toDelete = toDelete;
+    },
+
+    addCourseToTraining(formationId: string | number, courseToAdd: Course) {
+      const index = this.training_list.findIndex((u) => u.id == formationId);
+
+      if (index && index != -1) {
+        this.training_list[index].courses?.push(courseToAdd);
+      }
     },
   },
 });

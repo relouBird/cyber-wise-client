@@ -20,6 +20,11 @@ export const menuItemsConstants : MenuItem[] = [
     icon: 'mdi-school-outline',
     to: '/enterprise/trainings'
   },
+    {
+    title: 'Courses',
+    icon: 'mdi-book-open-outline',
+    to: '/enterprise/courses'
+  },
   // {
   //   title: 'Sensibilisations',
   //   icon: 'mdi-shield-account-outline',
