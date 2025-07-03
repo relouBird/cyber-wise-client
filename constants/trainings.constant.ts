@@ -3,44 +3,9 @@
 
 import type {
   ColorOption,
-  Domain,
   Formation,
   IconOption,
 } from "~/types/trainings.type";
-
-export const domainsConstants: Domain[] = [
-  {
-    id: 1,
-    name: "Sécurité des mots de passe",
-    description: "Apprenez à créer et gérer des mots de passe sécurisés",
-    icon: "mdi-key-variant",
-    color: "blue",
-  },
-  {
-    id: 2,
-    name: "Phishing et arnaques",
-    description: "Identifiez et évitez les tentatives de phishing",
-    icon: "mdi-email-alert",
-    color: "red",
-
-  },
-  
-  {
-    id: 3,
-    name: "Navigation sécurisée",
-    description: "Bonnes pratiques pour naviguer en sécurité",
-    icon: "mdi-web",
-    color: "green",
-
-  },
-  {
-    id: 4,
-    name: "Réseaux sociaux",
-    description: "Protégez votre vie privée sur les réseaux sociaux",
-    icon: "mdi-account-group",
-    color: "purple",
-  },
-];
 
 export const formationsConstants: Formation[] = [
   {
@@ -51,31 +16,24 @@ export const formationsConstants: Formation[] = [
     domainId: 1,
     active: true,
     courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
+      {
+        id: 1,
+        formation_id: 1,
+        title: "Introduction",
+        content: "Contenu du cours 1",
+        order: 1,
+      },
       {
         id: 2,
+        formation_id: 1,
         title: "Règles de base",
         content: "Contenu du cours 2",
         order: 2,
       },
     ],
-    createdAt: new Date("2024-01-15"),
-  },
-  {
-    id: 2,
-    title: "Gestionnaires de mots de passe",
-    description: "Utilisez des outils pour gérer vos mots de passe en sécurité",
-    domainId: 1,
-    active: false,
-    courses: [
-      {
-        id: 3,
-        title: "Choisir un gestionnaire",
-        content: "Contenu du cours 3",
-        order: 1,
-      },
-    ],
-    createdAt: new Date("2024-02-01"),
+    created_at: new Date("2024-01-15"),
+    categorie: "",
+    level: "beginner",
   },
 ];
 

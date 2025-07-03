@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import useCoursesStore from "~/stores/courses.store";
+import type { CategoryType } from "~/types/courses.type";
 
 // Définir le Middleware à utiliser
 definePageMeta({
@@ -15,6 +17,7 @@ useHead({
 });
 
 const router = useRouter();
+const coursesStore = useCoursesStore();
 
 const searchQuery = ref("");
 const selectedCategory = ref<string | null>(null);
@@ -22,14 +25,7 @@ const selectedLevel = ref<string | null>(null);
 const currentPage = ref(1);
 const itemsPerPage = 9;
 
-const categories = [
-  { title: "Mots de passe", value: "passwords" },
-  { title: "Phishing", value: "phishing" },
-  { title: "Navigation s\u00e9curis\u00e9e", value: "browsing" },
-  { title: "R\u00e9seaux sociaux", value: "social" },
-  { title: "Donn\u00e9es personnelles", value: "privacy" },
-  { title: "S\u00e9curit\u00e9 mobile", value: "mobile" },
-];
+const categories = ref<CategoryType[]>([]);
 
 const levels = [
   { title: "D\u00e9butant", value: "beginner" },
@@ -157,15 +153,11 @@ const totalPages = computed(() =>
 );
 
 function getCategoryColor(category: string): string {
-  const colors: Record<string, string> = {
-    passwords: "blue",
-    phishing: "red",
-    browsing: "green",
-    social: "purple",
-    privacy: "orange",
-    mobile: "teal",
-  };
-  return colors[category] || "grey";
+  const index = categories.value?.findIndex((u) => u.value == category);
+  if (index && index != -1) {
+    return categories.value[index].color;
+  }
+  return "grey";
 }
 
 function getLevelColor(level: string): string {
@@ -219,6 +211,15 @@ function deleteFormation(formation: any) {
     }
   }
 }
+
+onMounted(async () => {
+  if (coursesStore.getCategories.length != 0) {
+    categories.value = coursesStore.getCategories;
+  } else {
+    await coursesStore.getAllCategories();
+    categories.value = coursesStore.getCategories;
+  }
+});
 </script>
 
 <template>

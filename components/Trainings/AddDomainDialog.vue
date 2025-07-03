@@ -32,6 +32,7 @@ const colorOptions = [...colorOptionsConstants];
 
 // Formulaires
 const formValid = ref(false);
+const loading = ref(false);
 const domainForm = ref<Domain>({
   name: "",
   categorie: "",
@@ -53,6 +54,7 @@ const closeDomainDialog = () => {
 
 // cette fonction permet de sauvegarder le domaine...
 const saveDomain = async () => {
+  loading.value = true;
   if (props.modelCurrentDomainValue?.name != "") {
     // Modifier le domaine existant
     await trainingsStore.updateDomain(me?.id ?? "", domainForm.value);
@@ -60,6 +62,7 @@ const saveDomain = async () => {
     // Soumettre...
     await trainingsStore.createDomain(me?.id ?? "", domainForm.value);
   }
+  loading.value = false;
   closeDomainDialog();
 };
 
@@ -144,11 +147,14 @@ watch(
                 variant="outlined"
                 :style="{ backgroundColor: '#1a1a2e' }"
                 color="primary"
-                class="custom-field"
+                class="custom-field bg-fontcolor"
                 hide-details
               >
+                <template #prepend-item>
+                  <empty-card />
+                </template>
                 <template v-slot:item="{ props, item }">
-                  <v-list-item v-bind="props">
+                  <v-list-item v-bind="props" class="bg-fontcolor">
                     <template v-slot:prepend>
                       <v-icon :icon="item.value" />
                     </template>
@@ -173,6 +179,9 @@ watch(
                 class="custom-field"
                 hide-details
               >
+                <template #prepend-item>
+                  <empty-card />
+                </template>
                 <template v-slot:item="{ props, item }">
                   <v-list-item v-bind="props">
                     <template v-slot:prepend>
@@ -206,6 +215,7 @@ watch(
           color="primary"
           variant="flat"
           @click="saveDomain"
+          :loading="loading"
           :disabled="!formValid"
           class="text-none"
         >

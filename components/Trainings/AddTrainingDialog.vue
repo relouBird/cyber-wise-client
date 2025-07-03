@@ -25,9 +25,17 @@ const { me } = useAuthStore();
 
 // le formulaire
 const formValid = ref(false);
+const loading = ref(false);
+const levels = [
+  { title: "Débutant", value: "beginner" },
+  { title: "Intermédiaire", value: "intermediate" },
+  { title: "Avancé", value: "advanced" },
+];
+
 const formationForm = ref<Formation>({
   title: "",
   categorie: "",
+  level: "beginner",
   description: "",
   domainId: props.domainId,
   active: false,
@@ -52,12 +60,17 @@ const closeTrainingDialog = () => {
 
 // cette fonction permet de sauvegarder la formation...
 const saveFormation = async () => {
+  loading.value = true;
   if (props.modelCurrentTrainingValue?.title != "") {
     await trainingsStore.updateTraining(me?.id ?? "", formationForm.value);
   } else {
     // creation d'une formation...
     await trainingsStore.createTraining(me?.id ?? "", formationForm.value);
   }
+  imageFile.value = undefined;
+  imageFileString.value = undefined;
+  loading.value = false;
+
   closeTrainingDialog();
 };
 
@@ -71,7 +84,7 @@ watch(
       reader.readAsDataURL(file);
       reader.onload = () => {
         imageFileString.value = reader.result as string;
-        formationForm.value.image = JSON.stringify(file);
+        formationForm.value.image = file;
       };
       console.log("data :", formationForm.value);
     } else {
@@ -86,7 +99,20 @@ watch(
   () => props.modelCurrentTrainingValue,
   (newValue) => {
     console.log("new-data =>", newValue);
-    formationForm.value = { ...(newValue as Formation) };
+    if (newValue) {
+      formationForm.value = { ...(newValue as Formation) };
+      imageFileString.value = newValue.image as string;
+    } else {
+      formationForm.value = {
+        title: "",
+        categorie: "",
+        level: "beginner",
+        description: "",
+        domainId: props.domainId,
+        active: false,
+        courses: [],
+      };
+    }
   }
 );
 </script>
@@ -118,6 +144,29 @@ watch(
             class="mb-4 custom-field bg-fontcolorSecond"
             hide-details
           />
+          <v-select
+            v-model="formationForm.level"
+            :items="levels"
+            label="Difficulté"
+            placeholder="Filtrer par niveau"
+            variant="outlined"
+            hide-details
+            class="bg-fontcolor mb-4"
+            density="compact"
+          >
+            <template #prepend-item>
+              <empty-card />
+            </template>
+            <template v-slot:item="{ props, item }">
+              <v-list-item v-bind="props" class="bg-fontcolor py-2">
+              </v-list-item>
+            </template>
+            <template v-slot:selection="{ item }">
+              <div class="d-flex align-center py-2">
+                {{ item.title }}
+              </div>
+            </template>
+          </v-select>
 
           <v-textarea
             v-model="formationForm.description"
@@ -163,6 +212,7 @@ watch(
         <v-btn
           color="primary"
           variant="flat"
+          :loading="loading"
           @click="saveFormation"
           :disabled="!formValid"
           class="text-none"

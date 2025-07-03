@@ -22,6 +22,17 @@ export default function useTrainingService(): ServiceProps {
       data: payload,
     });
   };
+
+  /**
+   * Cette fonction permet de créer un service...
+   */
+  const updateDomain = async (id: string, payload: Domain) => {
+    return await request(`/admin/domains/${id}`, {
+      method: "put",
+      data: payload,
+    });
+  };
+
   /**
    * Cette fonction permet de créer un service...
    */
@@ -50,11 +61,33 @@ export default function useTrainingService(): ServiceProps {
     });
   };
 
+  /**
+   * Cette fonction permet de créer un service...
+   */
+  const updateTraining = async (id: string, payload: Domain) => {
+    return await request(`/admin/trainings/${id}`, {
+      method: "put",
+      data: payload,
+    });
+  };
+
+  /**
+   * Cette fonction permet de créer un service...
+   */
+  const deleteTraining = async (id: string) => {
+    return await request(`/admin/trainings/${id}`, {
+      method: "delete",
+    });
+  };
+
   return {
     fetchAllDomains,
     fetchAllTrainings,
     createDomain,
     createTraining,
+    updateDomain,
+    updateTraining,
     deleteDomain,
+    deleteTraining,
   };
 }
