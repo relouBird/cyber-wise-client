@@ -2,6 +2,7 @@
 import { MembersDeleteUser } from "#components";
 import { usersRole } from "~/constants/users.constant";
 import { formatDateFirstType, formatDateSecondType } from "~/helpers/utils";
+import useAuthStore from "~/stores/auth.store";
 import useUsersStore from "~/stores/users.store";
 import type { RoleType, UserProps } from "~/types/constant.type";
 
@@ -19,6 +20,7 @@ useHead({
 
 // Store des utilisateurs
 const useUsers = useUsersStore();
+const { me } = useAuthStore();
 
 // État réactif
 const loading = ref(false);
@@ -34,7 +36,7 @@ const editingUser = ref(false);
 
 // datas utiles pour delete un User
 const deleteDialog = ref(false);
-const idUserToDelete = ref<number>();
+const UserToDelete = ref<UserProps>();
 
 // Formulaire utilisateur
 const currentUser = ref<Partial<UserProps>>({
@@ -132,7 +134,7 @@ const editUser = (user: UserProps) => {
 };
 
 const deleteUser = (user: UserProps) => {
-  idUserToDelete.value = user.id;
+  UserToDelete.value = user;
   deleteDialog.value = true;
 };
 
@@ -151,7 +153,12 @@ onMounted(async () => {
   try {
     // Simuler un appel API
 
-    await useUsers.getUsersOnUrl();
+    if (me?.user_metadata.org_id) {
+      await useUsers.getUsersOnUrl(me?.user_metadata.org_id ?? "");
+    } else {
+      await useUsers.getUsersOnUrl(me?.id ?? "");
+    }
+
     users.value = useUsers.getUsers;
   } catch (error) {
     console.error("Erreur lors du chargement des utilisateurs:", error);
@@ -317,7 +324,7 @@ onUpdated(async () => {
         <!-- Slot pour la dernière connexion -->
         <template #item.lastLogin="{ item }">
           <span class="text-body-2 text-center">{{
-            item.lastLogin != undefined
+            item.lastLogin != "" && item.lastLogin != null
               ? formatDateSecondType(item.lastLogin)
               : "Premiere connexion"
           }}</span>
@@ -337,7 +344,6 @@ onUpdated(async () => {
               icon="mdi-pencil"
               size="small"
               variant="text"
-              color="warning"
               @click="editUser(item)"
             />
             <v-btn
@@ -377,9 +383,9 @@ onUpdated(async () => {
 
     <!-- Dialog de confirmation de suppression -->
     <MembersDeleteUser
-      v-if="idUserToDelete"
+      v-if="UserToDelete"
       v-model:model-value="deleteDialog"
-      v-bind:id="idUserToDelete"
+      v-bind:user="UserToDelete"
     />
   </div>
 </template>

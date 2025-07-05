@@ -1,7 +1,10 @@
 import type { AxiosResponse } from "axios";
 import { request } from "~/helpers/request_axios";
 import type { ServiceProps } from "~/types/common.type";
-import type { LoginCredentialType, RegisterCredentialType } from "~/types/user.type";
+import type {
+  LoginCredentialType,
+  RegisterCredentialType,
+} from "~/types/user.type";
 
 export default function useAuthService(): ServiceProps {
   /**
@@ -28,8 +31,22 @@ export default function useAuthService(): ServiceProps {
     });
   };
 
+  /**
+   * Se connecter via les credentials...
+   */
+  const update = async (
+    id: string,
+    payload: LoginCredentialType
+  ): Promise<AxiosResponse> => {
+    return await request(`/auth/${id}/update`, {
+      method: "put",
+      data: payload,
+    });
+  };
+
   return {
     register,
     login,
+    update,
   };
 }

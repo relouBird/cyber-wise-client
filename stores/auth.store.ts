@@ -52,6 +52,17 @@ const useAuthStore = defineStore("auth-store", {
         this.expired_at = data.data.session.expires_at * 1000;
         this.type = data.type;
         this.me = data.data.user;
+
+        if (this.me.user_metadata.org_id) {
+          let payload_second = {
+            ...this.me.user_metadata,
+            lastLogin: this.me.last_sign_in_at,
+            status: "Actif",
+          };
+          let response_second: AxiosResponse =
+            service.update &&
+            (await service.update(this.me.id, payload_second));
+        }
         if (this.type != "enterprise") {
           return navigateTo("/");
         } else {
@@ -96,12 +107,23 @@ const useAuthStore = defineStore("auth-store", {
       return navigateTo("/enterprise");
     },
 
-    signOut() {
+    async signOut() {
       // Ne jamais l'appeler dans le middleware cause des erreurs inattendus en vide le localstorage meme avant utilisation...
       // this is for signout user....
+      if (this.me && this.me.user_metadata.org_id) {
+        let payload_second = {
+          ...this.me.user_metadata,
+          lastLogin: this.me.last_sign_in_at,
+          status: "Inactif",
+        };
+
+        service.update && (await service.update(this.me.id, payload_second));
+      }
+
       this.access_token = null;
       this.refresh_token = null;
       this.expired_at = null;
+      this.me = null;
       return navigateTo("/auth/login");
     },
   },

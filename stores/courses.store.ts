@@ -80,6 +80,8 @@ const useCoursesStore = defineStore("courses-store", {
     async createCourse(creator_id: string, courseProto: Course) {
       let formData = new FormData();
 
+      let id = 1;
+
       formData.append("creator_id", creator_id);
       formData.append("formation_id", String(this.active_training));
       formData.append("title", courseProto.title);
@@ -93,14 +95,13 @@ const useCoursesStore = defineStore("courses-store", {
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as CourseResponse;
-        let product = { ...data.data };
-
-        product.image = courseProto.image;
-
-        this.courses.push(product);
+        id = data.data.id ?? 1;
+        this.courses.push({ ...data.data });
       } else if (response.status == 400) {
         console.log("error =>", response.data);
       }
+
+      return id;
     },
 
     async updateCourse(creator_id: string, courseProto: Course) {

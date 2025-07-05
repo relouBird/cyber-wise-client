@@ -65,11 +65,12 @@ const saveCourse = async () => {
     // Soumettre...
     console.log("fou-2");
 
-    await coursesStore.createCourse(me?.id ?? "", courseForm.value);
-
-    const index = coursesStore.getCourses.findIndex(
-      (u) => u.title == courseForm.value.title
+    let idTake = await coursesStore.createCourse(
+      me?.id ?? "",
+      courseForm.value
     );
+
+    const index = coursesStore.getCourses.findIndex((u) => u.id == idTake);
 
     if (index && index != -1) {
       trainingsStore.addCourseToTraining(

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import useUsersStore from "~/stores/users.store";
+import type { UserProps } from "~/types/constant.type";
 
 // Type pour propriétés
 type PropsType = {
   modelValue: boolean;
-  id: number | undefined;
+  user: UserProps | undefined;
 };
 
 // Definitions des Evenements du composant
@@ -22,10 +23,11 @@ const handleClick = () => {
 
 const confirmDelete = async () => {
   loading.value = true;
-  console.log("fou =>", props.id);
-  if (props.id) {
+  console.log("fou =>", props.user);
+  if (props.user) {
     try {
-      await useUsers.deleteUser(props.id);
+      await useUsers.deleteUser(props.user);
+
       loading.value = false;
     } catch (error) {
       console.error("Erreur lors de la suppression de l'utilisateur :", error);

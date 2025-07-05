@@ -93,6 +93,8 @@ onMounted(async () => {
     formations.value = trainingsStore.getTrainings;
   }
 });
+
+
 </script>
 
 <template>

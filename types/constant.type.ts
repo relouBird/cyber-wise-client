@@ -3,6 +3,7 @@ export interface ConfigurationInterface {
   option: string;
   image?: string;
 }
+
 export interface MenuItem {
   title: string;
   icon: string;
@@ -11,12 +12,15 @@ export interface MenuItem {
     text: string;
     color: string;
   };
+  children?: MenuItem[]; // Ajout pour les sous-menus
+  expanded?: boolean; // Pour gérer l'état d'expansion
 }
 
 export type RoleType = "Manager" | "Employé" | "Invité";
 
 export interface UserProps {
   id?: number;
+  org_id: string | number;
   firstName: string;
   lastName: string;
   email: string;

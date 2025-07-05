@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { usersRole } from "~/constants/users.constant";
 import { areObjectsDifferent } from "~/helpers/utils";
+import useAuthStore from "~/stores/auth.store";
 import useUsersStore from "~/stores/users.store";
 import type { RoleType, UserProps } from "~/types/constant.type";
 
@@ -23,6 +24,7 @@ const emit = defineEmits([
 
 // Store des utilisateurs
 const useUsers = useUsersStore();
+const { me } = useAuthStore();
 
 const formValid = ref(false);
 const loading = ref(false);
@@ -34,6 +36,7 @@ const roleOptions: RoleType[] = usersRole;
 const currentUser = ref<UserProps>({
   firstName: "",
   lastName: "",
+  org_id: "",
   email: "",
   role: usersRole[0],
   phone: "",
@@ -64,6 +67,11 @@ const saveUser = async () => {
       await useUsers.updateUser(currentUser.value as UserProps);
     } else {
       // Ajouter un nouvel utilisateur
+      if (me?.user_metadata.org_id) {
+        currentUser.value.org_id = me.user_metadata.org_id;
+      } else {
+        currentUser.value.org_id = me?.id ?? "";
+      }
       await useUsers.createUser(currentUser.value as UserProps);
     }
     loading.value = false;
@@ -80,7 +88,7 @@ watch(
   () => props.modelCurrentUserValue,
   (newValue) => {
     console.log("new-data =>", newValue);
-    currentUser.value = { ...(newValue as   UserProps) };
+    currentUser.value = { ...(newValue as UserProps) };
     console.log(
       "identique =>",
       !areObjectsDifferent(currentUser.value, props.modelCurrentUserValue)

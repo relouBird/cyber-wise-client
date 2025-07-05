@@ -27,11 +27,31 @@ const logout = (): void => {
   // navigateTo('/login')
 };
 
-onMounted(() => {
+// Fonction pour vérifier si un élément de menu est actif
+const isMenuItemActive = (item: MenuItem): boolean => {
+  if (!item.to) return false;
+  
+  // Si c'est exactement la même route
+  if (route.path === item.to) return true;
+  
+  // Si la route actuelle commence par le chemin de l'élément (pour les sous-pages)
+  // ET que ce n'est pas juste le préfixe de base
+  if (item.to !== '/enterprise' && route.path.startsWith(item.to + '/')) {
+    return true;
+  }
+  
+  return false;
+};
+
+onMounted(async () => {
   if (mobile.value) {
     rail.value = false;
   }
-  useStore.getUsersOnUrl();
+  if (authStore.me?.user_metadata.org_id) {
+    await useStore.getUsersOnUrl(authStore.me?.user_metadata.org_id ?? "");
+  } else {
+    await useStore.getUsersOnUrl(authStore.me?.id ?? "");
+  }
   const usersLength = ref(store.getLength.value);
   if (menuItems[1].badge) {
     menuItems[1].badge.text = String(usersLength.value);
@@ -83,6 +103,7 @@ onMounted(() => {
           :key="item.title"
           :to="item.to"
           class="nav-item"
+          :class="{ 'v-list-item--active': isMenuItemActive(item) }"
           rounded="xl"
         >
           <template v-slot:prepend>
@@ -92,7 +113,7 @@ onMounted(() => {
           <v-list-item-title
             class="text-body-2 text-primary"
             v-text="item.title"
-            v-if="route.path == item.to"
+            v-if="isMenuItemActive(item)"
           ></v-list-item-title>
           <v-list-item-title
             class="text-body-2"
