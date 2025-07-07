@@ -1,8 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { request } from "~/helpers/request_axios";
-import type { ActivityType } from "~/types/activity.type";
 import type { ServiceProps } from "~/types/common.type";
-import type { UserProps } from "~/types/constant.type";
 
 export default function useActivitiesService(): ServiceProps {
   /**

@@ -113,3 +113,14 @@ export interface Formation {
   totalParticipants?: number;
   completedParticipants?: number;
 }
+
+
+export interface CampaignResponse {
+  message: string;
+  data: Campaign;
+}
+
+export interface CampaignsResponse {
+  message: string;
+  data: Campaign[];
+}

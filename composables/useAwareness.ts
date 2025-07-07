@@ -2,6 +2,7 @@ import {
   mockCampaignsConstant,
   mockIncidentsConstant,
 } from "~/constants/awareness.constant";
+import useAuthStore from "~/stores/auth.store";
 import useAwarenessStore from "~/stores/awareness.store";
 import type {
   Campaign,
@@ -14,6 +15,7 @@ import type {
 
 export const useSensibilisations = () => {
   const campaignStore = useAwarenessStore();
+  const { me } = useAuthStore();
 
   // États réactifs
   const campaigns = computed(() => campaignStore.getCampaigns);
@@ -34,7 +36,11 @@ export const useSensibilisations = () => {
 
     try {
       // Simulation d'appel API
-      await campaignStore.fetchAllCampaigns("");
+      if (me?.user_metadata.org_id) {
+        await campaignStore.fetchAllCampaigns(me?.user_metadata.org_id);
+      } else {
+        await campaignStore.fetchAllCampaigns(me?.id ?? "");
+      }
     } catch (err) {
       error.value = "Erreur lors du chargement des campagnes";
       console.error(err);
@@ -55,8 +61,7 @@ export const useSensibilisations = () => {
 
   const getOtherCampaignById = async (id: string) => {
     const index = campaigns.value.findIndex((c) => c.id === id);
-    if(index){
-      
+    if (index) {
     }
   };
 
@@ -65,33 +70,17 @@ export const useSensibilisations = () => {
     error.value = null;
 
     try {
-      const newCampaign: Campaign = {
-        id: Date.now().toString(),
-        name: data.name,
-        description: data.description,
-        image:
-          typeof data.image === "string"
-            ? data.image
-            : URL.createObjectURL(data.image as File),
-        status: "draft",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        startDate: data.startDate,
-        endDate: data.endDate,
-        targetUsers: data.targetUsers,
-        formations: data.formations,
-        createdBy: "current-admin",
-        stats: {
-          totalUsers: data.targetUsers.length,
-          completedUsers: 0,
-          inProgressUsers: 0,
-          notStartedUsers: data.targetUsers.length,
-          completionRate: 0,
-        },
-      };
+      console.log("data-to-create =>", data);
 
-      campaigns.value.push(newCampaign);
-      return newCampaign;
+      if (me?.user_metadata.org_id) {
+        await campaignStore.createCampaign(
+          me?.id ?? "",
+          me?.user_metadata.org_id,
+          data
+        );
+      } else {
+        await campaignStore.createCampaign(me?.id ?? "", me?.id ?? "", data);
+      }
     } catch (err) {
       error.value = "Erreur lors de la création de la campagne";
       throw err;
@@ -100,14 +89,16 @@ export const useSensibilisations = () => {
     }
   };
 
-  const updateCampaign = async (data: UpdateCampaignData) => {
+  const updateCampaign = async (data: UpdateCampaignData, state?: boolean) => {
     loading.value = true;
     error.value = null;
     console.log("Voici l'id =>", data.id);
     console.log("Voici les datas =>", campaigns.value);
 
     try {
-      await campaignStore.updateCampaignById(data);
+      if (state) {
+        await campaignStore.updateCampaignById(data, true);
+      }
     } catch (err) {
       error.value = "Erreur lors de la mise à jour de la campagne";
       throw err;
@@ -131,15 +122,15 @@ export const useSensibilisations = () => {
   };
 
   const launchCampaign = async (id: string) => {
-    return await updateCampaign({ id: id, status: "active" });
+    return await updateCampaign({ id: id, status: "active" }, true);
   };
 
   const pauseCampaign = async (id: string) => {
-    return await updateCampaign({ id: id, status: "paused" });
+    return await updateCampaign({ id: id, status: "paused" }, true);
   };
 
   const completeCampaign = async (id: string) => {
-    return await updateCampaign({ id: id, status: "completed" });
+    return await updateCampaign({ id: id, status: "completed" }, true);
   };
 
   // Fonctions pour les incidents
@@ -183,10 +174,9 @@ export const useSensibilisations = () => {
         completedCampaigns: campaigns.value.filter(
           (c) => c.status === "completed"
         ).length,
-        totalParticipants: campaigns.value.reduce(
-          (sum, c) => sum + c.stats.totalUsers,
-          0
-        ),
+        totalParticipants: campaigns.value
+          .flatMap((c) => c.targetUsers) // fusionne tous les targetUsers
+          .filter((user, index, self) => self.indexOf(user) === index).length,
         averageCompletionRate:
           campaigns.value.reduce((sum, c) => sum + c.stats.completionRate, 0) /
           campaigns.value.length,
