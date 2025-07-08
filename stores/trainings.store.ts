@@ -273,7 +273,14 @@ const useTrainingsStore = defineStore("trainings-store", {
       const index = this.training_list.findIndex((u) => u.id == formationId);
 
       if (index && index != -1) {
-        this.training_list[index].courses?.push(courseToAdd);
+        const coursesTake = this.training_list[index].courses ?? [];
+        coursesTake.push(courseToAdd);
+
+        const trainingTake = {
+          ...this.training_list[index],
+          courses: coursesTake,
+        };
+        this.training_list[index] = { ...trainingTake };
       }
     },
   },

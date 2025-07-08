@@ -1,6 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { usersPrototype } from "~/constants/users.constant";
 import useUsersService from "~/services/users.service";
+import type { ActivityType } from "~/types/activity.type";
 import type {
   UserProps,
   UserResponseProps,
@@ -24,9 +25,9 @@ const useUsersStore = defineStore("users-store", {
     getLength: (state) => state.users_list.length,
   },
   actions: {
-    async getUsersOnUrl() {
+    async getUsersOnUrl(id: string) {
       const response: AxiosResponse =
-        service.fetchAll && (await service.fetchAll());
+        service.fetch && (await service.fetch(id));
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as UsersResponseProps;
@@ -45,6 +46,19 @@ const useUsersStore = defineStore("users-store", {
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as UserResponseProps;
+
+        let activityInstance: ActivityType = {
+          org_id: user.org_id as string,
+          activity_id: String(data.data.id),
+          type: "add",
+          title: "",
+          message: data.data.firstName + " " + data.data.lastName,
+        };
+
+        let activityResponse: AxiosResponse =
+          service.createActivity &&
+          (await service.createActivity(activityInstance));
+
         console.log("data =>", data);
         this.users_list.push(data.data);
       } else if (response.status == 500) {
@@ -74,12 +88,24 @@ const useUsersStore = defineStore("users-store", {
       return response;
     },
 
-    async deleteUser(userId: number) {
+    async deleteUser(user: UserProps) {
       const response: AxiosResponse =
-        service.remove && (await service.remove(userId.toString(), {}));
+        service.remove && (await service.remove(user.id ?? "", {}));
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data;
+
+        let activityInstance: ActivityType = {
+          org_id: user.org_id as string,
+          activity_id: String(user.id),
+          type: "delete",
+          title: "",
+          message: user.firstName + " " + user.lastName,
+        };
+
+        let activityResponse: AxiosResponse =
+          service.createActivity &&
+          (await service.createActivity(activityInstance));
 
         // remplace dans la liste
         this.users_list = this.users_list.filter((u) => u.id !== data.data);

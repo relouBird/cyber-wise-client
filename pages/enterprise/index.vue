@@ -4,8 +4,12 @@ import {
   rapidActions,
   recaps,
 } from "~/constants/dashboard.constant";
+import useActivitiesStore from "~/stores/activities.store";
+import useAuthStore from "~/stores/auth.store";
 import useTrainingsStore from "~/stores/trainings.store";
 import useUsersStore from "~/stores/users.store";
+import { getActivityColor, getActivityIcon, timeSince } from "~/helpers/utils";
+import type { ActivityType } from "~/types/activity.type";
 import type {
   Stats,
   Activity,
@@ -27,23 +31,33 @@ useHead({
 
 const useUsers = useUsersStore();
 const useTrainings = useTrainingsStore();
+const { me } = useAuthStore();
+const useActivities = useActivitiesStore();
 const storeUsers = storeToRefs(useUsers);
 const storeTrainings = storeToRefs(useTrainings);
 
 // Données réactives
 const stats = reactive<Statistics[]>(recaps);
 const rapidsActionsData = reactive<Actions[]>(rapidActions);
-const recentActivities = ref<Activity[]>(activities);
+const recentActivities = computed(() => useActivities.getActivities);
 
 // Simulation de chargement des statistiques (à remplacer par votre API)
 onMounted(async () => {
   try {
     const dataTrainings = ref<number>(storeTrainings.getTrainings.value.length);
     const dataUsers = ref<number>(storeUsers.getLength.value);
+    const dataIncidents = ref<number>(useActivities.getIncidents.length);
+
+    if (me?.user_metadata.org_id) {
+      await useActivities.getAll(me.user_metadata.org_id);
+    } else {
+      await useActivities.getAll(me?.id ?? "");
+    }
 
     // positionnnement...
     stats[0].number = dataUsers.value;
     stats[1].number = dataTrainings.value;
+    stats[3].number = dataIncidents.value;
   } catch (error) {
     console.error("Erreur lors du chargement des statistiques:", error);
   }
@@ -113,14 +127,18 @@ onMounted(async () => {
             <v-list-item
               v-for="activity in recentActivities"
               :key="activity.id"
-              :prepend-icon="activity.icon"
+              :prepend-icon="getActivityIcon(activity.type)"
               :title="activity.title"
-              :subtitle="activity.subtitle"
+              :subtitle="activity.message"
               class="px-0 bg-transparent"
             >
               <template #append>
-                <v-chip :color="activity.color" size="small" variant="tonal">
-                  {{ activity.time }}
+                <v-chip
+                  :color="getActivityColor(activity.type)"
+                  size="small"
+                  variant="tonal"
+                >
+                  {{ timeSince(activity.created_at ?? "") }}
                 </v-chip>
               </template>
             </v-list-item>

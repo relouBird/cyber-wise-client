@@ -1,5 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { request } from "~/helpers/request_axios";
+import type { ActivityType } from "~/types/activity.type";
 import type { ServiceProps } from "~/types/common.type";
 import type { UserProps } from "~/types/constant.type";
 
@@ -13,8 +14,23 @@ export default function useUsersService(): ServiceProps {
     });
   };
 
+  const fetch = async (id: string): Promise<AxiosResponse> => {
+    return await request(`/admin/users/${id}`, {
+      method: "get",
+    });
+  };
+
   const create = async (payload: UserProps): Promise<AxiosResponse> => {
     return await request(`/admin/users`, {
+      method: "post",
+      data: payload,
+    });
+  };
+
+  const createActivity = async (
+    payload: ActivityType
+  ): Promise<AxiosResponse> => {
+    return await request(`/admin/activity/user`, {
       method: "post",
       data: payload,
     });
@@ -38,7 +54,9 @@ export default function useUsersService(): ServiceProps {
 
   return {
     fetchAll,
+    fetch,
     create,
+    createActivity,
     update,
     remove,
   };

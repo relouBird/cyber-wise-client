@@ -16,7 +16,7 @@ type PropsType = {
 // Definitions des propriété du composant
 const props = defineProps<PropsType>();
 
-const imageLink = ref<string>("");
+const imageLink = computed(() => props.course.image as string);
 
 // methodes...
 function viewCourse(course: Course) {
@@ -35,17 +35,7 @@ async function deleteCourse(id: number) {
 
 onMounted(() => {
   categories.value = coursesStore.getCategories;
-  if (typeof props.course.image == "object") {
-    let det = "";
-    const reader = new FileReader();
-    reader.readAsDataURL(props.course.image as File);
-    reader.onload = () => {
-      det = reader.result as string;
-    };
-    imageLink.value = det;
-  } else {
-    imageLink.value = props.course.image as string;
-  }
+  console.log("image =>", props.course.image);
 });
 </script>
 
@@ -62,12 +52,7 @@ onMounted(() => {
       </div>
 
       <!-- Image de la formation -->
-      <v-img
-        :src="imageLink"
-        height="140"
-        cover
-        class="formation-image"
-      >
+      <v-img :src="imageLink" height="140" cover class="formation-image">
         <div class="d-flex align-end fill-height">
           <div class="gradient-overlay w-100 pa-4"></div>
         </div>

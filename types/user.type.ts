@@ -35,6 +35,17 @@ type AppMetadata = {
   providers: string[];
 };
 
+type UserMetaData = {
+  email_verified: boolean;
+  firstName: string;
+  lastName: string;
+  org_id?: string;
+  role?: string;
+  phone?: string;
+  status: "Actif" | "Inactif";
+  [key: string]: any; // Index signature pour permettre des propriétés supplémentaires
+};
+
 export type User = {
   id: string;
   aud: string;
@@ -44,7 +55,7 @@ export type User = {
   phone: string;
   last_sign_in_at: string;
   app_metadata: AppMetadata;
-  user_metadata: Record<string, unknown>;
+  user_metadata: UserMetaData;
   identities: UserIdentity[];
   created_at: string;
   updated_at: string;
@@ -64,10 +75,10 @@ export type UserData = {
   session: Session;
 };
 
-export type UserType = RoleType | "enterprise"
+export type UserType = RoleType | "enterprise";
 
 export type UserResponse = {
-  message : string;
-  data : UserData;
-  type: UserType
-}
+  message: string;
+  data: UserData;
+  type: UserType;
+};
