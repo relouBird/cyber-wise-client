@@ -98,7 +98,7 @@ const initializeForm = () => {
       targetUsers: [...props.campaign.targetUsers],
       formations: [...props.campaign.formations],
     };
-    imagePreview.value = props.campaign.image;
+    imagePreview.value = props.campaign.image as string;
   } else {
     resetForm();
   }

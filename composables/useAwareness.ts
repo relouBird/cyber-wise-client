@@ -4,6 +4,7 @@ import {
 } from "~/constants/awareness.constant";
 import useAuthStore from "~/stores/auth.store";
 import useAwarenessStore from "~/stores/awareness.store";
+import useUsersStore from "~/stores/users.store";
 import type {
   Campaign,
   CampaignUser,
@@ -15,6 +16,7 @@ import type {
 
 export const useSensibilisations = () => {
   const campaignStore = useAwarenessStore();
+  const usersStore = useUsersStore();
   const { me } = useAuthStore();
 
   // États réactifs
@@ -50,9 +52,10 @@ export const useSensibilisations = () => {
   };
 
   const getCampaignById = (id: string) => {
-    const campaign = campaigns.value.find((c) => c.id === id);
+    const campaign = campaigns.value.find((c) => c.id == id);
     if (campaign) {
       currentCampaign.value = campaign;
+      // console.log("Voici la campagne chargée =>", campaign);
       // ici on devrait charger tout les utili
       return campaign;
     }

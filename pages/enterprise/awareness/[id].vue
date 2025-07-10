@@ -18,6 +18,7 @@ import {
   getFormationStatusColor,
   getStatusColor,
 } from "~/helpers/awareness-helper";
+import useTrainingsStore from "~/stores/trainings.store";
 
 // Composables
 const route = useRoute();
@@ -33,12 +34,15 @@ definePageMeta({
 // Composables
 const {
   incidents: inc,
-  campaignUsers,
   launchCampaign, // demarrer la campagne...
   pauseCampaign, // mettre la campagne en pause
   fetchCampaigns,
   getCampaignById,
 } = useSensibilisations();
+
+// stores
+const awarenessStore = useAwarenessStore();
+const { getTrainings } = useTrainingsStore();
 
 // Données réactives
 const loading = ref(false);
@@ -47,13 +51,21 @@ const loadingIncidents = ref(false);
 const currentTab = ref("participants");
 const addDialog = ref<"participant" | "formation" | "incident">();
 
+const removeDialog = ref<"participant" | "formation" | "incident">();
+const removeId = ref<number | string>();
+const removeState = ref<boolean>(false);
+
 // ID de la campagne
 const campaignId = computed(() => route.params.id as string);
 
 // Données de la campagne
 const campaign = computed(() => getCampaignById(campaignId.value));
-const participants = ref<CampaignUser[]>([...campaignUsers.value]);
-const formations = ref<Formation[]>([]);
+const participants = computed(() => awarenessStore.getActiveCampaignsUsers);
+const formations = computed(() =>
+  getTrainings.filter((u) =>
+    campaign.value?.formations.includes(u.id as unknown as string)
+  )
+);
 const incidents = ref<Incident[]>([...inc.value]);
 
 // Computed
@@ -72,6 +84,14 @@ const participantHeaders = [...participantHeadersConst];
 const incidentHeaders = [...incidentHeadersConst];
 
 // Méthodes
+const getRoleColor = (role: string) => {
+  const colors: Record<string, string> = {
+    Manager: "warning",
+    Employé: "primary",
+    Invité: "info",
+  };
+  return colors[role] || "default";
+};
 
 const contactParticipant = (participant: CampaignUser) => {
   // Logique pour contacter un participant
@@ -79,11 +99,8 @@ const contactParticipant = (participant: CampaignUser) => {
 };
 
 const removeParticipant = async (participant: CampaignUser) => {
-  try {
-    await campaignStore.removeParticipant(campaignId.value, participant.id);
-  } catch (error) {
-    console.error("Erreur lors de la suppression du participant:", error);
-  }
+  removeId.value = participant.id;
+  removeDialog.value = "participant";
 };
 
 const removeFormation = async (formation: Formation) => {
@@ -103,6 +120,27 @@ const exportIncidents = () => {
   console.log("Exporter incidents");
 };
 
+// methodes de suppression
+const handleDelete = async () => {
+  if (removeDialog.value && removeId.value) {
+    try {
+      removeDialog.value == "participant"
+        ? await campaignStore.removeParticipant(
+            campaignId.value,
+            removeId.value as string
+          )
+        : await campaignStore.removeFormation(
+            campaignId.value,
+            removeId.value as string
+          );
+      removeDialog.value = undefined;
+      removeState.value = false;
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+    }
+  }
+};
+
 // Lifecycle
 onMounted(async () => {
   loading.value = true;
@@ -110,20 +148,24 @@ onMounted(async () => {
 
   await fetchCampaigns();
   try {
-    participants.value = await campaignStore.getCampaignParticipants(
-      campaignId.value
-    );
-    formations.value = await campaignStore.getCampaignFormations(
-      campaignId.value
-    );
-    incidents.value = await campaignStore.getCampaignIncidents(
-      campaignId.value
-    );
+    await campaignStore.getCampaignParticipants(campaignId.value);
+    await campaignStore.getCampaignFormations(campaignId.value);
+    await campaignStore.getCampaignIncidents(campaignId.value);
   } catch (error) {
   } finally {
     loading.value = false;
   }
 });
+
+// watch...
+watch(
+  () => removeDialog.value,
+  (newValue) => {
+    if (newValue != undefined) {
+      removeState.value = true;
+    }
+  }
+);
 </script>
 
 <template>
@@ -213,7 +255,7 @@ onMounted(async () => {
                 <v-card variant="tonal" color="primary">
                   <v-card-text class="text-center">
                     <div class="text-h3 font-weight-bold">
-                      {{ campaignUsers.length || 0 }}
+                      {{ participants.length || 0 }}
                     </div>
                     <div class="text-subtitle-1">Participants</div>
                   </v-card-text>
@@ -312,10 +354,38 @@ onMounted(async () => {
                 </v-avatar>
               </template>
 
+              <!-- Slot pour le nom complet -->
+              <template #item.user="{ item }">
+                <div>
+                  <div class="font-weight-medium">
+                    {{ item.firstName }} {{ item.lastName }}
+                  </div>
+                  <div class="text-caption text-grey-darken-1">
+                    {{ item.email }}
+                  </div>
+                </div>
+              </template>
+              <!-- Slot pour le rôle -->
+              <template #item.role="{ item }">
+                <v-chip
+                  :color="getRoleColor(item.role)"
+                  variant="tonal"
+                  size="small"
+                >
+                  {{ item.role }}
+                </v-chip>
+              </template>
+
               <template v-slot:item.statut="{ item }">
                 <v-chip
                   :color="getParticipantStatusColor(item.status)"
-                  :text="item.status"
+                  :text="
+                    item.status == 'not_started'
+                      ? 'Non Commencé'
+                      : item.status == 'in_progress'
+                      ? 'En Cours'
+                      : 'Terminé'
+                  "
                   size="small"
                 />
               </template>
@@ -336,12 +406,14 @@ onMounted(async () => {
               <template v-slot:item.actions="{ item }">
                 <v-btn
                   icon="mdi-eye"
+                  color="primary"
                   size="small"
                   variant="text"
                   to="/enterprise/users"
                 />
                 <v-btn
                   icon="mdi-message"
+                  color="primary"
                   size="small"
                   variant="text"
                   @click="contactParticipant(item)"
@@ -362,7 +434,7 @@ onMounted(async () => {
           <v-tabs-window-item value="formations">
             <div class="d-flex justify-space-between align-center mb-7">
               <h3 class="text-h5">
-                Formations assignées ({{ formations.length }})
+                Formations assignées ({{ campaign?.formations.length }})
               </h3>
               <v-btn
                 color="primary"
@@ -375,62 +447,12 @@ onMounted(async () => {
               </v-btn>
             </div>
 
-            <v-row>
-              <v-col
+            <v-row
+              ><courses-formation-box
                 v-for="formation in formations"
-                :key="formation.id"
-                cols="12"
-                md="6"
-                lg="4"
-              >
-                <v-card>
-                  <v-img :src="formation.image" height="200" cover>
-                    <div class="d-flex justify-end pa-2">
-                      <v-chip
-                        :color="formation.mandatory ? 'error' : 'info'"
-                        :text="
-                          formation.mandatory ? 'Obligatoire' : 'Optionnelle'
-                        "
-                        size="small"
-                      />
-                    </div>
-                  </v-img>
-                  <v-card-title class="text-h6">{{
-                    formation.title
-                  }}</v-card-title>
-                  <v-card-text>
-                    <p class="text-body-2 mb-2">{{ formation.description }}</p>
-                    <div class="d-flex justify-space-between align-center">
-                      <span class="text-caption"
-                        >Durée: {{ formation.duration }}</span
-                      >
-                      <v-chip
-                        :color="getFormationStatusColor(formation.status)"
-                        :text="formation.status"
-                        size="small"
-                      />
-                    </div>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-btn
-                      color="primary"
-                      variant="text"
-                      to="/enterprise/formations"
-                    >
-                      Voir détails
-                    </v-btn>
-                    <v-spacer />
-                    <v-btn
-                      icon="mdi-delete"
-                      size="small"
-                      variant="text"
-                      color="error"
-                      @click="removeFormation(formation)"
-                      :disabled="campaign?.status === 'completed'"
-                    />
-                  </v-card-actions>
-                </v-card>
-              </v-col>
+                :formation="formation"
+                :handle-click="() => {}"
+              />
             </v-row>
           </v-tabs-window-item>
 
@@ -567,6 +589,22 @@ onMounted(async () => {
         </v-tabs-window>
       </v-card-text>
     </v-card>
+
+    <!-- Dialog de confirmation de suppression -->
+    <v-dialog v-model="removeState" max-width="500">
+      <v-card class="bg-fontcolor">
+        <v-card-title class="text-h6"> Confirmer la suppression </v-card-title>
+        <v-card-text>
+          Êtes-vous sûr de vouloir supprimer ce "{{ removeDialog }}" ? Cette
+          action est irréversible.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click="removeState = false"> Annuler </v-btn>
+          <v-btn color="error" @click="handleDelete"> Supprimer </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Dialogs -->
     <!-- <ParticipantDialog

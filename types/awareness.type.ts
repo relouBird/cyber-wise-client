@@ -27,6 +27,8 @@ export interface CampaignUser {
   avatar: string;
   firstName: string;
   lastName: string;
+  email: string;
+  role: string;
   campaignId: string;
   userId: string;
   status: "not_started" | "in_progress" | "completed";
@@ -114,7 +116,6 @@ export interface Formation {
   completedParticipants?: number;
 }
 
-
 export interface CampaignResponse {
   message: string;
   data: Campaign;
@@ -123,4 +124,9 @@ export interface CampaignResponse {
 export interface CampaignsResponse {
   message: string;
   data: Campaign[];
+}
+
+export interface CampaignUserResponse {
+  message: string;
+  data: CampaignUser[];
 }

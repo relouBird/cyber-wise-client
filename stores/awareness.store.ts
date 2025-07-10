@@ -5,12 +5,15 @@ import type {
   Campaign,
   CampaignResponse,
   CampaignsResponse,
+  CampaignUser,
+  CampaignUserResponse,
   CreateCampaignData,
   UpdateCampaignData,
 } from "~/types/awareness.type";
 
 type StateProps = {
   campaign_list: Campaign[];
+  campaign_users_list: CampaignUser[];
 };
 
 const service = useAwarenessService();
@@ -19,10 +22,12 @@ const useAwarenessStore = defineStore("awareness-store", {
   state: () =>
     <StateProps>{
       campaign_list: [],
+      campaign_users_list: [],
     },
   persist: true,
   getters: {
     getCampaigns: (state) => state.campaign_list,
+    getActiveCampaignsUsers: (state) => state.campaign_users_list,
   },
   actions: {
     // ceci permet de recuperer toutes les campagnes d'un org
@@ -110,17 +115,39 @@ const useAwarenessStore = defineStore("awareness-store", {
     },
 
     async deleteCampaignById(campaignId: string | number) {
-      const index = this.campaign_list.findIndex((c) => c.id == campaignId);
-      if (index !== -1) {
-        this.campaign_list.splice(index, 1);
-      } else {
-        throw new Error("Campagne non trouvée");
+      const response: AxiosResponse =
+        service.deleteCampaign && (await service.deleteCampaign(campaignId));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as CampaignResponse;
+        console.log("data-to-response-store =>", data);
+        const index = this.campaign_list.findIndex((c) => c.id == data.data.id);
+        if (index !== -1) {
+          this.campaign_list.splice(index, 1);
+        } else {
+          throw new Error("Campagne non trouvée");
+        }
+      } else if (response.status == 400) {
+        console.log("error =>", response.data);
       }
     },
 
     async getCampaignParticipants(id: string) {
+      const response: AxiosResponse =
+        service.getUsersCampaign && (await service.getUsersCampaign(id));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as CampaignUserResponse;
+        console.log("data-to-response-store =>", data);
+
+        this.campaign_users_list = [...data.data];
+      } else if (response.status == 400) {
+        console.log("error =>", response.data);
+      }
       return [];
     },
+
+    
     async getCampaignFormations(id: string) {
       return [];
     },
