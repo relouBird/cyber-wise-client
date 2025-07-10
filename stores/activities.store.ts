@@ -15,7 +15,7 @@ const useActivitiesStore = defineStore("activities-store", {
     },
   persist: true,
   getters: {
-    getActivities: (state) => state.activities_list.reverse().slice(0,4),
+    getActivities: (state) => [...state.activities_list].slice(-4).reverse(),
     getIncidents: (state) =>
       state.activities_list.filter((u) => u.type == "incident"),
   },

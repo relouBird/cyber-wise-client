@@ -14,7 +14,7 @@ export default function useAwarenessService(): ServiceProps {
   };
 
   const fetch = async (id: string): Promise<AxiosResponse> => {
-    return await request(`/admin/campaigns/${id}`, {
+    return await request(`/admin/campaigns/${id}/org`, {
       method: "get",
     });
   };
@@ -38,10 +38,26 @@ export default function useAwarenessService(): ServiceProps {
     });
   };
 
+  const getUsersCampaign = async (
+    campaignId: string
+  ): Promise<AxiosResponse> => {
+    return await request(`/admin/campaigns/${campaignId}/users`, {
+      method: "get",
+    });
+  };
+
+  const deleteCampaign = async (campaignId: string): Promise<AxiosResponse> => {
+    return await request(`/admin/campaigns/${campaignId}`, {
+      method: "delete",
+    });
+  };
+
   return {
     fetchAll,
     fetch,
     createCampaign,
     updateCampaign,
+    deleteCampaign,
+    getUsersCampaign,
   };
 }

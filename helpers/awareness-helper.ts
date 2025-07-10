@@ -1,15 +1,16 @@
-export const getParticipantStatusColor = (statut: string) => {
-  switch (statut) {
-    case "En cours":
-      return "primary";
-    case "Terminé":
-      return "success";
-    case "Non commencé":
-      return "grey";
-    case "Bloqué":
-      return "error";
-    default:
-      return "grey";
+export const getParticipantStatusColor = (statut: string): string => {
+  console.log("Statut reçu :", statut);
+
+  if (statut === "in_progress") {
+    return "primary";
+  } else if (statut === "completed") {
+    return "success";
+  } else if (statut === "not_started") {
+    return "grey";
+  } else if (statut === "bloqued") {
+    return "error";
+  } else {
+    return "grey";
   }
 };
 

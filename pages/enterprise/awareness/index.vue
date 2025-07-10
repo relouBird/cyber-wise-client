@@ -454,7 +454,7 @@ watch(showCreateDialog, (newValue) => {
 
     <!-- Dialog de confirmation de suppression -->
     <v-dialog v-model="showDeleteDialog" max-width="500">
-      <v-card>
+      <v-card class="bg-fontcolor">
         <v-card-title class="text-h6"> Confirmer la suppression </v-card-title>
         <v-card-text>
           Êtes-vous sûr de vouloir supprimer la campagne "{{

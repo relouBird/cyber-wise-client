@@ -79,12 +79,11 @@ export const sortAwarenessConst = [
 
 export const participantHeadersConst = [
   { title: "", key: "avatar", sortable: false },
-  { title: "Nom", key: "nom" },
-  { title: "Prénom", key: "prenom" },
-  { title: "Email", key: "email" },
+  { title: "Utilisateurs", key: "user" },
+  { title: "Role", key: "role" },
   { title: "Statut", key: "statut" },
   { title: "Progression", key: "progression" },
-  { title: "Dernière connexion", key: "derniereConnexion" },
+  // { title: "Dernière connexion", key: "derniereConnexion" },
   { title: "Actions", key: "actions", sortable: false },
 ];
 
