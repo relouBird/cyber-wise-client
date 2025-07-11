@@ -22,9 +22,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       themes: {
         dark: {
           colors: {
-            primary: "rgb(255,107,157)",
+            primary: "rgb(255, 107, 157)",
             secondary: "#764ba2",
             fontcolor:"rgba(26,26,46,0.25)",
+            fontcolorthird:"rgb(40, 40, 72)",
             fontcolorSecond:"#1a1a2e",
             accent: "#ff6b9d",
             error: "#ff5252",
