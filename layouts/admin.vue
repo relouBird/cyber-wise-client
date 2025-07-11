@@ -30,16 +30,16 @@ const logout = (): void => {
 // Fonction pour vérifier si un élément de menu est actif
 const isMenuItemActive = (item: MenuItem): boolean => {
   if (!item.to) return false;
-  
+
   // Si c'est exactement la même route
   if (route.path === item.to) return true;
-  
+
   // Si la route actuelle commence par le chemin de l'élément (pour les sous-pages)
   // ET que ce n'est pas juste le préfixe de base
-  if (item.to !== '/enterprise' && route.path.startsWith(item.to + '/')) {
+  if (item.to !== "/enterprise" && route.path.startsWith(item.to + "/")) {
     return true;
   }
-  
+
   return false;
 };
 
@@ -89,7 +89,7 @@ onMounted(async () => {
           <span
             v-if="!rail"
             class="logo-text font-manrope font-manrope-400 ml-3"
-            >SafeSteps</span
+            >SecuriConscience</span
           >
         </div>
       </div>
@@ -237,7 +237,7 @@ onMounted(async () => {
 
 <style scoped>
 .admin-layout {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+  background: linear-gradient(135deg, #1a1a2ea2 0%, #16213ea2 50%, #0f3460a2 100%),url("/assets/images/configuration/font1.jpg");
   min-height: 100vh;
   position: relative;
 }
@@ -338,7 +338,7 @@ onMounted(async () => {
 .logo-square-small img {
   width: 100%;
   height: auto;
-  transform: scale(200%) translateY(2px);
+  transform: translateY(-2px);
 }
 
 .logo-text {

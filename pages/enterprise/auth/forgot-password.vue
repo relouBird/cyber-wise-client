@@ -62,7 +62,7 @@ const handleLogin = async () => {
         <div class="logo-square">
           <img src="~/assets/images/image1.png" alt="">
         </div>
-        <h2 class="logo-text font-manrope font-manrope-400">SafeSteps</h2>
+        <h2 class="logo-text font-manrope font-manrope-400">SecuriConscience</h2>
       </div>
 
       <!-- Titre de bienvenue -->
@@ -175,7 +175,7 @@ const handleLogin = async () => {
 .logo-square img{
   width: 100%;
   height: auto;
-  transform: scale(290%);
+  transform: scale(170%);
 }
 
 .logo-text {

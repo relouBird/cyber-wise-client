@@ -76,7 +76,7 @@ async function handleLogout() {
             <img src="~/assets/images/image1.png" alt="" />
           </div>
           <span class="logo-text-small font-manrope font-manrope-400">
-            SafeSteps
+            SecuriConscience
           </span>
         </div>
       </nuxt-link>
@@ -184,7 +184,7 @@ async function handleLogout() {
                 <img src="~/assets/images/image1.png" alt="" />
               </div>
               <span class="logo-text-small font-manrope font-manrope-400"
-                >SafeSteps</span
+                >SecuriConscience</span
               >
             </div>
             <p class="footer-text mt-2">
@@ -193,7 +193,7 @@ async function handleLogout() {
           </v-col>
           <v-col cols="12" md="6" class="text-md-right">
             <p class="footer-copyright mt-3">
-              &copy; {{ currentYear }} SafeSteps. Tous droits réservés.
+              &copy; {{ currentYear }} SecuriConscience. Tous droits réservés.
             </p>
           </v-col>
         </v-row>
@@ -204,7 +204,14 @@ async function handleLogout() {
 
 <style scoped>
 .admin-layout {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+  /* background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%); */
+  background: linear-gradient(
+      135deg,
+      #1a1a2ea2 0%,
+      #16213ea2 50%,
+      #0f3460a2 100%
+    ),
+    url("/assets/images/configuration/font1.jpg");
   min-height: 100vh;
   position: relative;
 }
@@ -314,7 +321,7 @@ async function handleLogout() {
 .logo-square-small img {
   width: 100%;
   height: auto;
-  transform: scale(200%);
+  transform: translateY(-2px);
 }
 
 .logo-text-small {

@@ -43,7 +43,7 @@ useHead({
 
 .auth-layout {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #1a1a2ea2 0%, #16213ea2 50%, #0f3460a2 100%),url("/assets/images/configuration/font1.jpg");
   position: relative;
   overflow: hidden;
   display: flex;

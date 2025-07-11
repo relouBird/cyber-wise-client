@@ -52,6 +52,15 @@ export default function useTrainingService(): ServiceProps {
   };
 
   /**
+   * Fetch all les Formations...
+   */
+  const fetchAllSubTrainings = async (): Promise<AxiosResponse> => {
+    return await request(`/trainings`, {
+      method: "get",
+    });
+  };
+
+  /**
    * Cette fonction permet de créer un service...
    */
   const createTraining = async (payload: Domain) => {
@@ -83,6 +92,7 @@ export default function useTrainingService(): ServiceProps {
   return {
     fetchAllDomains,
     fetchAllTrainings,
+    fetchAllSubTrainings,
     createDomain,
     createTraining,
     updateDomain,

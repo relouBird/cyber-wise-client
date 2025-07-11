@@ -1,21 +1,11 @@
 <script setup lang="ts">
-import {
-  activities,
-  rapidActions,
-  recaps,
-} from "~/constants/dashboard.constant";
+import { rapidActions, recaps } from "~/constants/dashboard.constant";
 import useActivitiesStore from "~/stores/activities.store";
 import useAuthStore from "~/stores/auth.store";
 import useTrainingsStore from "~/stores/trainings.store";
 import useUsersStore from "~/stores/users.store";
 import { getActivityColor, getActivityIcon, timeSince } from "~/helpers/utils";
-import type { ActivityType } from "~/types/activity.type";
-import type {
-  Stats,
-  Activity,
-  Statistics,
-  Actions,
-} from "~/types/dashboard.type";
+import type { Statistics, Actions } from "~/types/dashboard.type";
 
 // Définir le Middleware à utiliser
 definePageMeta({
@@ -94,30 +84,7 @@ onMounted(async () => {
     <!-- Graphiques et activités récentes -->
     <v-row>
       <v-col cols="12" md="8">
-        <v-card class="pa-6 bg-fontcolor">
-          <v-card-title class="text-h5 mb-4"
-            >Activité des 7 derniers jours</v-card-title
-          >
-          <div class="chart-container" style="height: 300px">
-            <!-- Placeholder pour un graphique -->
-            <v-sheet
-              color="grey-lighten-4"
-              class="d-flex align-center justify-center"
-              height="100%"
-              rounded
-            >
-              <div class="text-center">
-                <v-icon size="64" color="grey-darken-1">mdi-chart-line</v-icon>
-                <p class="text-h6 mt-2 text-grey-darken-1">
-                  Graphique d'activité
-                </p>
-                <p class="text-body-2 text-grey-darken-1">
-                  Erreur lors du chargement...
-                </p>
-              </div>
-            </v-sheet>
-          </div>
-        </v-card>
+        <charts-line-incident />
       </v-col>
 
       <v-col cols="12" md="4">
@@ -153,6 +120,13 @@ onMounted(async () => {
           ></v-empty-state>
         </v-card>
       </v-col>
+
+      <v-col cols="12" md="6">
+        <charts-bar-users-activities />
+      </v-col>
+      <v-col cols="12" md="6">
+        <charts-training-doughnut />
+      </v-col>
     </v-row>
 
     <!-- Actions rapides -->
@@ -180,6 +154,28 @@ onMounted(async () => {
       </v-col>
     </v-row>
   </div>
+
+  <!-- <v-card class="pa-6 bg-fontcolor">
+    <v-card-title class="text-h5 mb-4"
+      >Activité des 7 derniers jours</v-card-title
+    >
+    <div class="chart-container" style="height: 300px">
+      <v-sheet
+        color="grey-lighten-4"
+        class="d-flex align-center justify-center"
+        height="100%"
+        rounded
+      >
+        <div class="text-center">
+          <v-icon size="64" color="grey-darken-1">mdi-chart-line</v-icon>
+          <p class="text-h6 mt-2 text-grey-darken-1">Graphique d'activité</p>
+          <p class="text-body-2 text-grey-darken-1">
+            Erreur lors du chargement...
+          </p>
+        </div>
+      </v-sheet>
+    </div>
+  </v-card> -->
 </template>
 
 <style scoped>

@@ -36,6 +36,19 @@ export interface Formation {
   created_at?: Date;
 }
 
+export interface FormationSub {
+  id?: number;
+  title: string;
+  description: string;
+  category: string;
+  level: "beginner" | "intermediate" | "advanced";
+  duration: number;
+  enrolledCount: number;
+  progress: number;
+  active: boolean;
+  image?: string;
+}
+
 export interface IconOption {
   title: string;
   value: string;
