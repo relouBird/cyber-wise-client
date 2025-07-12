@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import useAuthStore from "~/stores/auth.store";
 
 const authStore = useAuthStore();
@@ -6,6 +6,12 @@ const route = useRoute();
 
 // État de la sidebar mobile
 const drawer = ref(false);
+
+interface MenuItem {
+  title: string;
+  to: string;
+  icon: string;
+}
 
 // Données de navigation
 const navigationItems = [
@@ -36,6 +42,22 @@ const userActions = [
 
 // Année courante
 const currentYear = new Date().getFullYear();
+
+// Fonction pour vérifier si un élément de menu est actif
+const isMenuItemActive = (item: MenuItem): boolean => {
+  if (!item.to) return false;
+
+  // Si c'est exactement la même route
+  if (route.path === item.to) return true;
+
+  // Si la route actuelle commence par le chemin de l'élément (pour les sous-pages)
+  // ET que ce n'est pas juste le préfixe de base
+  if (item.to !== "/enterprise" && route.path.startsWith(item.to + "/")) {
+    return true;
+  }
+
+  return false;
+};
 
 // Fonction de déconnexion
 async function handleLogout() {
@@ -103,6 +125,7 @@ async function handleLogout() {
             :to="item.to"
             variant="text"
             class="nav-btn"
+            :class="{ 'v-list-item--active': isMenuItemActive(item) }"
             v-else
           >
             <v-icon start>{{ item.icon }}</v-icon>
@@ -203,6 +226,11 @@ async function handleLogout() {
 </template>
 
 <style scoped>
+.v-list-item--active {
+  background: rgba(255, 107, 157,0.2);
+  color: rgb(255, 107, 157);
+}
+
 .admin-layout {
   /* background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%); */
   background: linear-gradient(

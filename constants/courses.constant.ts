@@ -1,5 +1,4 @@
-import type { CategoryType } from "~/types/courses.type";
-import type { Formation } from "~/types/trainings.type";
+import type { CategoryType, SubCoursesInterface } from "~/types/courses.type";
 
 export const categoriesConstants: CategoryType[] = [
   { title: "Mots de passe", value: "passwords", color: "blue" },
@@ -14,131 +13,73 @@ export const categoriesConstants: CategoryType[] = [
   { title: "S\u00e9curit\u00e9 mobile", value: "mobile", color: "teal" },
 ];
 
-export const formationsConstants: Formation[] = [
+export const rawCoursesConstants: SubCoursesInterface[] = [
   {
     id: 1,
-    title: "Cr\u00e9er des mots de passe forts",
-    description:
-      "Apprenez \u00e0 cr\u00e9er et g\u00e9rer des mots de passe s\u00e9curis\u00e9s pour prot\u00e9ger vos comptes en ligne.",
-    categorie: "passwords",
-    level: "beginner",
-    active: true,
-    courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
-      {
-        id: 2,
-        title: "Règles de base",
-        content: "Contenu du cours 2",
-        order: 2,
-      },
-    ],
-    image:
-      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=200&fit=crop",
-    domainId: 1,
+    title: "Qu'est-ce que le Phishing ?",
+    image: "/images/phishing-intro.jpg",
+    content: `
+Le phishing, ou hameçonnage en français, est une technique d'ingénierie sociale utilisée par les cybercriminels pour voler des informations sensibles.
+
+## Comment ça fonctionne ?
+
+Les attaquants envoient des messages frauduleux qui semblent provenir d'une source fiable (banque, réseau social, etc.) pour inciter les victimes à :
+
+- Révéler leurs mots de passe
+- Communiquer leurs informations bancaires
+- Télécharger des logiciels malveillants
+
+ATTENTION: Les attaques de phishing sont responsables de 90% des violations de données.
+    `,
+    order: 1,
+    status: "pending",
   },
   {
     id: 2,
-    title: "Identifier les tentatives de phishing",
-    description:
-      "Reconnaissez et \u00e9vitez les emails et sites web malveillants qui tentent de voler vos informations.",
-    categorie: "phishing",
-    level: "beginner",
-    active: true,
-    courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
-      {
-        id: 2,
-        title: "Règles de base",
-        content: "Contenu du cours 2",
-        order: 2,
-      },
-    ],
-    image:
-      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=200&fit=crop",
-    domainId: 1,
+    title: "Reconnaître un Email de Phishing",
+    image: "/images/phishing-email.jpg",
+    content: `
+Savoir identifier un email de phishing est crucial pour votre sécurité. Voici les signes révélateurs :
+
+## Indices visuels
+
+- Expéditeur suspect : Adresse email qui ne correspond pas à l'organisation
+- Urgence artificielle : "Votre compte sera fermé dans 24h"
+- Fautes d'orthographe : Erreurs dans le texte ou le nom de l'entreprise
+- Liens douteux : URLs qui ne correspondent pas au site officiel
+
+## Technique de vérification
+
+Passez votre souris sur les liens sans cliquer pour voir l'URL de destination dans la barre de statut.
+
+ASTUCE: En cas de doute, contactez directement l'organisation par un autre moyen.
+    `,
+    order: 2,
+    status: "pending",
   },
   {
     id: 3,
-    title: "Navigation s\u00e9curis\u00e9e sur Internet",
-    description:
-      "D\u00e9couvrez les bonnes pratiques pour naviguer en toute s\u00e9curit\u00e9 sur le web.",
-    categorie: "browsing",
-    level: "intermediate",
-    courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
-      {
-        id: 2,
-        title: "Règles de base",
-        content: "Contenu du cours 2",
-        order: 2,
-      },
-    ],
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=200&fit=crop",
-    domainId: 1,
-  },
-  {
-    id: 4,
-    title: "S\u00e9curit\u00e9 sur les r\u00e9seaux sociaux",
-    description:
-      "Prot\u00e9gez votre vie priv\u00e9e et vos donn\u00e9es sur Facebook, Instagram, Twitter et autres plateformes.",
-    categorie: "social",
-    level: "beginner",
-    courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
-      {
-        id: 2,
-        title: "Règles de base",
-        content: "Contenu du cours 2",
-        order: 2,
-      },
-    ],
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=200&fit=crop",
-    domainId: 1,
-  },
-  {
-    id: 5,
-    title: "Protection des donn\u00e9es personnelles",
-    description:
-      "Comprenez vos droits et apprenez \u00e0 prot\u00e9ger efficacement vos informations personnelles.",
-    categorie: "privacy",
-    level: "intermediate",
-    courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
-      {
-        id: 2,
-        title: "Règles de base",
-        content: "Contenu du cours 2",
-        order: 2,
-      },
-    ],
-    active: false,
-    image:
-      "https://images.unsplash.com/photo-1563207153-f403bf289096?w=400&h=200&fit=crop",
-    domainId: 1,
-  },
-  {
-    id: 6,
-    title: "S\u00e9curit\u00e9 des appareils mobiles",
-    description:
-      "S\u00e9curisez vos smartphones et tablettes contre les menaces et les applications malveillantes.",
-    categorie: "mobile",
-    courses: [
-      { id: 1, title: "Introduction", content: "Contenu du cours 1", order: 1 },
-      {
-        id: 2,
-        title: "Règles de base",
-        content: "Contenu du cours 2",
-        order: 2,
-      },
-    ],
-    level: "advanced",
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=200&fit=crop",
-    domainId: 1,
+    title: "Protection Avancée contre le Phishing",
+    image: "/images/phishing-protection.jpg",
+    content: `
+Découvrez les méthodes avancées pour vous protéger efficacement contre les attaques de phishing.
+
+## Outils de protection
+
+- Authentification à deux facteurs : Même si vos identifiants sont compromis
+- Gestionnaire de mots de passe : Détecte automatiquement les sites frauduleux
+- Filtres anti-phishing : Dans votre navigateur et client email
+
+## Bonnes pratiques
+
+- Vérifiez toujours l'URL avant de saisir des informations
+- Utilisez des connexions sécurisées (HTTPS)
+- Mettez à jour régulièrement vos logiciels
+- Signalez les tentatives de phishing
+
+RESULTAT: Avec ces techniques, vous réduisez le risque d'être victime de 95%.
+    `,
+    order: 3,
+    status: "pending",
   },
 ];

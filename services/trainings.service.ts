@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { request } from "~/helpers/request_axios";
 import type { ServiceProps } from "~/types/common.type";
-import type { Domain } from "~/types/trainings.type";
+import type { Domain, FormationSub } from "~/types/trainings.type";
 
 export default function useTrainingService(): ServiceProps {
   /**
@@ -54,9 +54,22 @@ export default function useTrainingService(): ServiceProps {
   /**
    * Fetch all les Formations...
    */
-  const fetchAllSubTrainings = async (): Promise<AxiosResponse> => {
-    return await request(`/trainings`, {
+  const fetchAllSubTrainings = async (id: string): Promise<AxiosResponse> => {
+    return await request(`/trainings/${id}/all`, {
       method: "get",
+    });
+  };
+
+  /**
+   * Permet de creer un la soucrisption a une formation
+   */
+  const createSubTraining = async (
+    id: string,
+    payload: FormationSub
+  ): Promise<AxiosResponse> => {
+    return await request(`/trainings/${id}`, {
+      method: "post",
+      data: payload,
     });
   };
 
@@ -95,6 +108,7 @@ export default function useTrainingService(): ServiceProps {
     fetchAllSubTrainings,
     createDomain,
     createTraining,
+    createSubTraining,
     updateDomain,
     updateTraining,
     deleteDomain,

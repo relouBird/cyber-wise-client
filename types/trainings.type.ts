@@ -14,6 +14,7 @@ export interface Domain {
 export interface Course {
   id?: number;
   formation_id: number;
+  level?: string;
   creator_id?: string;
   title: string;
   content: string;
@@ -38,6 +39,7 @@ export interface Formation {
 
 export interface FormationSub {
   id?: number;
+  sub?: number;
   title: string;
   description: string;
   category: string;
@@ -86,7 +88,17 @@ export interface TrainingsResponse {
   data: Formation[];
 }
 
+export interface SubTrainingsResponse {
+  message: string;
+  data: FormationSub[];
+}
+
 export interface TrainingResponse {
   message: string;
   data: Formation;
+}
+
+export interface SubTrainingResponse {
+  message: string;
+  data: FormationSub;
 }

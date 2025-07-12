@@ -3,6 +3,8 @@ import type {
   CategoryType,
   CourseResponse,
   CoursesResponse,
+  SubCoursesInterface,
+  SubCoursesResponse,
 } from "~/types/courses.type";
 import { categoriesConstants } from "~/constants/courses.constant";
 import type { Course, Domain } from "~/types/trainings.type";
@@ -12,8 +14,10 @@ import { notify } from "~/helpers/notifications";
 type StateProps = {
   name: string;
   active_training: number | null;
+  active_level: "beginner" | "intermediate" | "advanced";
   category_list: CategoryType[];
   courses: Course[];
+  courses_sub: SubCoursesInterface[];
 };
 
 const service = useCoursesService();
@@ -25,6 +29,8 @@ const useCoursesStore = defineStore("courses-store", {
       active_training: null,
       category_list: [],
       courses: [],
+      courses_sub: [],
+      active_level: "beginner",
     },
   persist: true,
   getters: {
@@ -68,6 +74,24 @@ const useCoursesStore = defineStore("courses-store", {
         let data = response.data as CoursesResponse;
         console.log("data-courses =>", data);
         this.courses = data.data;
+      } else if (response.status == 404) {
+        console.log("error =>", response.data);
+      } else if (response.status == 500) {
+        console.log("error =>", response.data);
+      }
+
+      return response;
+    },
+
+    async getFormationsCoursesSubscription(id: number | string) {
+      const response: AxiosResponse =
+        service.fetchAllCoursesSub &&
+        (await service.fetchAllCoursesSub(id));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as SubCoursesResponse;
+        console.log("data-courses =>", data);
+        this.courses_sub = data.data;
       } else if (response.status == 404) {
         console.log("error =>", response.data);
       } else if (response.status == 500) {
