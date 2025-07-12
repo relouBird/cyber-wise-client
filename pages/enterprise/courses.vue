@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { formationsConstants } from "~/constants/courses.constant";
 import useCoursesStore from "~/stores/courses.store";
 import useTrainingsStore from "~/stores/trainings.store";
 import type { CategoryType } from "~/types/courses.type";
-import type { Course, Formation } from "~/types/trainings.type";
+import type { Course} from "~/types/trainings.type";
 
 // Définir le Middleware à utiliser
 definePageMeta({

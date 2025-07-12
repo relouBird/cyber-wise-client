@@ -14,6 +14,15 @@ export default function useCoursesService(): ServiceProps {
   };
 
   /**
+   * Recuperer toutes les souscriptions cours...
+   */
+  const fetchAllCoursesSub = async (id: string): Promise<AxiosResponse> => {
+    return await request(`/trainings/${id}/courses`, {
+      method: "get",
+    });
+  };
+
+  /**
    * Creer un cours...
    */
   const createCourse = async (payload: Course): Promise<AxiosResponse> => {
@@ -58,6 +67,7 @@ export default function useCoursesService(): ServiceProps {
     fetchAllCategories,
     createCourse,
     deleteCourse,
+    fetchAllCoursesSub,
     updateCourse,
     getFormationCourses,
   };

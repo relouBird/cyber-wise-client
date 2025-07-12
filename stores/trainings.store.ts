@@ -8,6 +8,9 @@ import type {
   DomainResponse,
   DomainsResponse,
   Formation,
+  FormationSub,
+  SubTrainingResponse,
+  SubTrainingsResponse,
   TrainingDeleteResponse,
   TrainingResponse,
   TrainingsResponse,
@@ -16,6 +19,7 @@ import type {
 type StateProps = {
   domains_list: Domain[];
   training_list: Formation[];
+  sub_training_list: FormationSub[];
   toDelete: Domain | Formation | null;
 };
 
@@ -26,12 +30,14 @@ const useTrainingsStore = defineStore("trainings-store", {
     <StateProps>{
       domains_list: [],
       training_list: [],
+      sub_training_list: [],
       toDelete: null,
     },
   persist: true,
   getters: {
     getDomains: (state) => state.domains_list,
     getTrainings: (state) => state.training_list,
+    getSubTrainings: (state) => state.sub_training_list,
     getDelete: (state) => state.toDelete,
   },
   actions: {
@@ -152,14 +158,15 @@ const useTrainingsStore = defineStore("trainings-store", {
     },
 
     // partie qui gere les subscription aux formations
-    async getAllSubTraining() {
+    async getAllSubTraining(id: string) {
       const response: AxiosResponse =
-        service.fetchAllSubTrainings && (await service.fetchAllSubTrainings());
+        service.fetchAllSubTrainings &&
+        (await service.fetchAllSubTrainings(id));
 
       if (response.status == 200 || response.status == 201) {
-        let data = response.data as TrainingsResponse;
-        console.log("data =>", data.data);
-        this.training_list = data.data;
+        let data = response.data as SubTrainingsResponse;
+        console.log("data-sub-training =>", data.data);
+        this.sub_training_list = data.data;
       } else if (response.status == 404) {
         console.log("error =>", response.data);
       } else if (response.status == 500) {
@@ -203,6 +210,23 @@ const useTrainingsStore = defineStore("trainings-store", {
       } else if (response.status == 400) {
         console.log("error =>", response.data);
       }
+    },
+
+    async createSubTraining(author_id: string, subTraining: FormationSub) {
+      const response: AxiosResponse =
+        service.createSubTraining &&
+        (await service.createSubTraining(author_id, subTraining));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as SubTrainingResponse;
+        console.log("data-create-sub =>", data.data);
+      } else if (response.status == 404) {
+        console.log("error =>", response.data);
+      } else if (response.status == 500) {
+        console.log("error =>", response.data);
+      }
+
+      return response.data.data as FormationSub;
     },
 
     async updateTraining(

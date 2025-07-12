@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { finalUserFormationConst } from "~/constants/trainings.constant";
+import useAuthStore from "~/stores/auth.store";
 import useCoursesStore from "~/stores/courses.store";
 import useTrainingsStore from "~/stores/trainings.store";
 import type { CategoryType } from "~/types/courses.type";
@@ -21,6 +23,7 @@ useHead({
 const router = useRouter();
 const coursesStore = useCoursesStore();
 const trainingsStore = useTrainingsStore();
+const { me } = useAuthStore();
 
 const searchQuery = ref("");
 const selectedCategory = ref<string | null>(null);
@@ -36,92 +39,13 @@ const levels = [
   { title: "Avanc\u00e9", value: "advanced" },
 ];
 
-const formations = ref<FormationSub[]>([
-  {
-    id: 1,
-    title: "Cr\u00e9er des mots de passe forts",
-    description:
-      "Apprenez \u00e0 cr\u00e9er et g\u00e9rer des mots de passe s\u00e9curis\u00e9s pour prot\u00e9ger vos comptes en ligne.",
-    category: "passwords",
-    level: "beginner",
-    duration: 45,
-    enrolledCount: 124,
-    progress: 0,
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=200&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Identifier les tentatives de phishing",
-    description:
-      "Reconnaissez et \u00e9vitez les emails et sites web malveillants qui tentent de voler vos informations.",
-    category: "phishing",
-    level: "beginner",
-    duration: 30,
-    enrolledCount: 89,
-    progress: 65,
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=200&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Navigation s\u00e9curis\u00e9e sur Internet",
-    description:
-      "D\u00e9couvrez les bonnes pratiques pour naviguer en toute s\u00e9curit\u00e9 sur le web.",
-    category: "browsing",
-    level: "intermediate",
-    duration: 60,
-    enrolledCount: 156,
-    progress: 0,
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=200&fit=crop",
-  },
-  {
-    id: 4,
-    title: "S\u00e9curit\u00e9 sur les r\u00e9seaux sociaux",
-    description:
-      "Prot\u00e9gez votre vie priv\u00e9e et vos donn\u00e9es sur Facebook, Instagram, Twitter et autres plateformes.",
-    category: "social",
-    level: "beginner",
-    duration: 40,
-    enrolledCount: 203,
-    progress: 25,
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=200&fit=crop",
-  },
-  {
-    id: 5,
-    title: "Protection des donn\u00e9es personnelles",
-    description:
-      "Comprenez vos droits et apprenez \u00e0 prot\u00e9ger efficacement vos informations personnelles.",
-    category: "privacy",
-    level: "intermediate",
-    duration: 75,
-    enrolledCount: 67,
-    progress: 0,
-    active: false,
-    image:
-      "https://images.unsplash.com/photo-1563207153-f403bf289096?w=400&h=200&fit=crop",
-  },
-  {
-    id: 6,
-    title: "S\u00e9curit\u00e9 des appareils mobiles",
-    description:
-      "S\u00e9curisez vos smartphones et tablettes contre les menaces et les applications malveillantes.",
-    category: "mobile",
-    level: "advanced",
-    duration: 90,
-    enrolledCount: 45,
-    progress: 100,
-    active: true,
-    image:
-      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=200&fit=crop",
-  },
-]);
+const formations = computed(() => trainingsStore.getSubTrainings);
+
+// ceci permettra d'afficher la popup avec la petite video de lancement de la campagne...
+const modalLink = ref<string>();
+const addModal = ref<boolean>(false);
+
+const loading = ref<number>();
 
 const filteredFormations = computed(() => {
   let filtered = formations.value;
@@ -160,7 +84,7 @@ function getCategoryColor(category: string): string {
   if (index && index != -1) {
     return categories.value[index].color;
   }
-  return "grey";
+  return "blue";
 }
 
 function getLevelColor(level: string): string {
@@ -182,41 +106,28 @@ function openCreateDialog() {
   console.log("Ouvrir la modal de cr\u00e9ation de formation");
 }
 
-function viewFormation(formation: any) {
-  router.push(`/formations/${formation.id}`);
+function viewFormation(formation: FormationSub) {
+  // router.push(`/courses/${formation.id}`);
+  modalLink.value = `formation-id-${formation.id}`;
 }
 
-function startFormation(formation: any) {
-  router.push(`/formations/${formation.id}/start`);
-}
-
-function editFormation(formation: any) {
-  console.log("\u00c9diter la formation:", formation.title);
-}
-
-function duplicateFormation(formation: any) {
-  console.log("Dupliquer la formation:", formation.title);
-}
-
-function toggleFormationStatus(formation: any) {
-  formation.active = !formation.active;
-}
-
-function deleteFormation(formation: any) {
-  if (
-    confirm(
-      `\u00cates-vous s\u00fbr de vouloir supprimer la formation "${formation.title}" ?`
-    )
-  ) {
-    const index = formations.value.findIndex((f) => f.id === formation.id);
-    if (index > -1) {
-      formations.value.splice(index, 1);
-    }
+async function startFormation(formation: FormationSub) {
+  try {
+    loading.value = formation.id;
+    const newTraining = await trainingsStore.createSubTraining(
+      me?.id ?? "",
+      formation
+    );
+    coursesStore.active_level = formation.level;
+    router.push(`/courses/${newTraining.id}`);
+  } catch (error) {
+  } finally {
+    loading.value = undefined;
   }
 }
 
 onMounted(async () => {
-  await trainingsStore.getAllTraining();
+  await trainingsStore.getAllSubTraining(me?.id ?? "");
   if (coursesStore.getCategories.length != 0) {
     categories.value = coursesStore.getCategories;
   } else {
@@ -224,6 +135,15 @@ onMounted(async () => {
     categories.value = coursesStore.getCategories;
   }
 });
+
+watch(
+  () => modalLink.value,
+  (newValue) => {
+    if (newValue) {
+      addModal.value = true;
+    }
+  }
+);
 </script>
 
 <template>
@@ -315,7 +235,7 @@ onMounted(async () => {
           @click="viewFormation(formation)"
         >
           <!-- Badge de statut -->
-          <div class="position-absolute top-0 right-0 ma-3">
+          <div class="position-absolute top-0 right-0 ma-3 zind">
             <v-chip
               :color="formation.active ? 'success' : 'error'"
               size="small"
@@ -401,6 +321,8 @@ onMounted(async () => {
               variant="flat"
               block
               class="text-none"
+              :disabled="!formation.active"
+              :loading="loading == formation.id"
               @click.stop="startFormation(formation)"
             >
               {{ formation.progress > 0 ? "Continuer" : "Commencer" }}
@@ -408,7 +330,7 @@ onMounted(async () => {
           </v-card-actions>
 
           <!-- Menu d'actions -->
-          <v-menu location="bottom end">
+          <!-- <v-menu location="bottom end">
             <template v-slot:activator="{ props }">
               <v-btn
                 v-bind="props"
@@ -463,7 +385,7 @@ onMounted(async () => {
                 <v-list-item-title>Supprimer</v-list-item-title>
               </v-list-item>
             </v-list>
-          </v-menu>
+          </v-menu> -->
         </v-card>
       </v-col>
     </v-row>
@@ -531,6 +453,10 @@ onMounted(async () => {
 
 .position-absolute {
   position: absolute;
+}
+
+.zind {
+  z-index: 5;
 }
 
 .top-0 {

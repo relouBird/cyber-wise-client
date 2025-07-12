@@ -63,10 +63,10 @@ const useAuthStore = defineStore("auth-store", {
             service.update &&
             (await service.update(this.me.id, payload_second));
         }
-        if (this.type != "enterprise") {
-          return navigateTo("/");
-        } else {
+        if (this.type == "enterprise" || this.type == "Manager") {
           return navigateTo("/enterprise");
+        } else {
+          return navigateTo("/");
         }
       } else if (response.status == 500) {
         console.log("error =>", response.data);
