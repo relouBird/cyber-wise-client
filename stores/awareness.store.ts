@@ -9,10 +9,13 @@ import type {
   CampaignUserResponse,
   CreateCampaignData,
   UpdateCampaignData,
+  UserCampaign,
+  UserCampaignsResponse,
 } from "~/types/awareness.type";
 
 type StateProps = {
   campaign_list: Campaign[];
+  user_campaign_list: UserCampaign[];
   campaign_users_list: CampaignUser[];
 };
 
@@ -22,6 +25,7 @@ const useAwarenessStore = defineStore("awareness-store", {
   state: () =>
     <StateProps>{
       campaign_list: [],
+      user_campaign_list: [],
       campaign_users_list: [],
     },
   persist: true,
@@ -147,7 +151,6 @@ const useAwarenessStore = defineStore("awareness-store", {
       return [];
     },
 
-    
     async getCampaignFormations(id: string) {
       return [];
     },
@@ -156,6 +159,26 @@ const useAwarenessStore = defineStore("awareness-store", {
     },
     async removeParticipant(campaignId: string, userId: string) {},
     async removeFormation(campaignId: string, formationId: string) {},
+
+    // Ceci est la partie qui permet de gerer la partie utilisateur final
+
+    async fetchAllUserCampaigns(id: string, uid: string) {
+      const response: AxiosResponse =
+        service.fetchByUser && (await service.fetchByUser(id, uid));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as UserCampaignsResponse;
+        console.log("data-to-response-store =>", data);
+
+        this.user_campaign_list = [...data.data];
+      } else if (response.status == 400) {
+        console.log("error =>", response.data);
+      }
+    },
+
+    async fetchAllFormationByCampaignId(id:string){
+      
+    }
   },
 });
 

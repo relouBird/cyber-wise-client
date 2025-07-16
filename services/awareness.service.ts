@@ -19,6 +19,17 @@ export default function useAwarenessService(): ServiceProps {
     });
   };
 
+  const fetchByUser = async (
+    id: string,
+    uid: string
+  ): Promise<AxiosResponse> => {
+    return await request(`/campaigns/${id}.${uid}/org`, {
+      method: "get",
+    });
+  };
+
+  const fetchAllSubTrainingsByCampaignId = (id: string) => {};
+
   const createCampaign = async (
     payload: CreateCampaignData
   ): Promise<AxiosResponse> => {
@@ -55,6 +66,7 @@ export default function useAwarenessService(): ServiceProps {
   return {
     fetchAll,
     fetch,
+    fetchByUser,
     createCampaign,
     updateCampaign,
     deleteCampaign,

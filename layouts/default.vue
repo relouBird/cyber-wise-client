@@ -17,6 +17,7 @@ interface MenuItem {
 const navigationItems = [
   { title: "Accueil", to: "/", icon: "mdi-home" },
   { title: "Cours", to: "/courses", icon: "mdi-school" },
+  { title: "Campagnes", to: "/awareness", icon: "mdi-shield-account" },
   { title: "Practice", to: "/projects", icon: "mdi-folder-multiple" },
   { title: "Profile", to: "/profile", icon: "mdi-account" },
 ];

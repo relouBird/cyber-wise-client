@@ -61,6 +61,18 @@ export default function useTrainingService(): ServiceProps {
   };
 
   /**
+   * Fetch all les Formations...
+   */
+  const fetchAllCampaignSubTrainings = async (
+    userId: string,
+    campaignId: string
+  ): Promise<AxiosResponse> => {
+    return await request(`/trainings/${userId}/all/${campaignId}`, {
+      method: "get",
+    });
+  };
+
+  /**
    * Permet de creer un la soucrisption a une formation
    */
   const createSubTraining = async (
@@ -106,6 +118,7 @@ export default function useTrainingService(): ServiceProps {
     fetchAllDomains,
     fetchAllTrainings,
     fetchAllSubTrainings,
+    fetchAllCampaignSubTrainings,
     createDomain,
     createTraining,
     createSubTraining,

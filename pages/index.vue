@@ -4,6 +4,12 @@ import { useRouter } from "vue-router";
 import { Chart, registerables } from "chart.js";
 import useAuthStore from "~/stores/auth.store";
 
+// Définir le Middleware à utiliser
+definePageMeta({
+  middleware: ["auth", "user"],
+  layout: "default",
+});
+
 Chart.register(...registerables);
 
 // use

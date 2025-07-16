@@ -46,9 +46,22 @@ export interface FormationSub {
   level: "beginner" | "intermediate" | "advanced";
   duration: number;
   enrolledCount: number;
+  status: "not_started" | "in_progress" | "completed";
   progress: number;
   active: boolean;
   image?: string;
+}
+
+export interface ThirdFormation {
+  id: number;
+  name: string;
+  description: string;
+  totalCourses: number;
+  completedCourses: number;
+  userProgress: number;
+  userStatus: "not_started" | "in_progress" | "completed";
+  estimatedTime: number;
+  points: number;
 }
 
 export interface IconOption {
