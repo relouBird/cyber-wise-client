@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { rawCoursesConstants } from "~/constants/courses.constant";
 import { formatCourseContent } from "~/helpers/utils";
+import useAuthStore from "~/stores/auth.store";
 import useCoursesStore from "~/stores/courses.store";
 import type { SubCoursesInterface } from "~/types/courses.type";
 
@@ -10,19 +11,23 @@ import type { SubCoursesInterface } from "~/types/courses.type";
 const route = useRoute();
 const router = useRouter();
 const coursesStore = useCoursesStore();
+const { me } = useAuthStore();
 
 // State
-const currentCourse = ref(0);
+const currentCourse = ref<number>(0);
 const courses = ref<SubCoursesInterface[]>([]);
 const showFinishDialog = ref(false);
 const loading = ref(true);
 
-
-
 // Methods
 
-const nextCourse = () => {
+const nextCourse = async () => {
   if (currentCourse.value < courses.value.length - 1) {
+    if (courses.value[currentCourse.value].id) {
+      await coursesStore.completeCourse(
+        courses.value[currentCourse.value].id ?? 1
+      );
+    }
     currentCourse.value++;
   }
 };
@@ -37,7 +42,12 @@ const goToCourse = (index: number) => {
   currentCourse.value = index;
 };
 
-const finishCourse = () => {
+const finishCourse = async () => {
+  if (courses.value[currentCourse.value].id) {
+    await coursesStore.completeCourse(
+      courses.value[currentCourse.value].id ?? 1
+    );
+  }
   showFinishDialog.value = true;
 };
 
@@ -63,9 +73,8 @@ const getDifficultyLevel = () => {
 onMounted(async () => {
   try {
     loading.value = true;
-    await coursesStore.getFormationsCoursesSubscription(
-      route.params.id as string
-    );
+    coursesStore.setActiveTraining(Number(route.params.id));
+    await coursesStore.getFormationsCoursesSubscription();
     // Simuler un appel API
     await new Promise((resolve) => setTimeout(resolve, 800));
     courses.value = coursesStore.courses_sub.map((course) => ({
@@ -87,11 +96,14 @@ onMounted(async () => {
       <div class="progress-section">
         <div class="progress-info">
           <span class="progress-text"
-            >Cours {{ currentCourse + 1 }} sur {{ courses.length }}</span
+            >Cours {{ courses.length ? currentCourse + 1 : 0 }} sur
+            {{ courses.length }}</span
           >
           <span class="progress-percentage"
             >{{
-              Math.round(((currentCourse + 1) / courses.length) * 100)
+              courses.length
+                ? Math.round(((currentCourse + 1) / courses.length) * 100)
+                : 0
             }}%</span
           >
         </div>

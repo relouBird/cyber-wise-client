@@ -1,3 +1,5 @@
+import type { FormationSub, ThirdFormation } from "~/types/trainings.type";
+
 export function areObjectsDifferent(
   obj1: Record<string, any>,
   obj2: Record<string, any>
@@ -136,4 +138,32 @@ export function formatCourseContent(raw: string): string {
 
       return acc + line;
     }, "");
+}
+
+export function transformToThirdFormation(
+  formation: FormationSub
+): ThirdFormation {
+  return {
+    id: formation.id ?? formation.sub ?? Date.now(),
+    name: formation.title,
+    description: formation.description,
+    totalCourses: 1, // valeur arbitraire ou logique à adapter
+    completedCourses: formation.status === "completed" ? 1 : 0,
+    userProgress: formation.progress,
+    userStatus: formation.status,
+    estimatedTime: formation.duration,
+    points: calculatePoints(formation), // fonction utilitaire
+  };
+}
+
+function calculatePoints(formation: FormationSub): number {
+  const base = 100;
+  const levelMultiplier = {
+    beginner: 1,
+    intermediate: 2,
+    advanced: 3,
+  };
+
+  const progressFactor = formation.progress / 100;
+  return Math.round(base * levelMultiplier[formation.level] * progressFactor);
 }

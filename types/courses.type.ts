@@ -18,6 +18,7 @@ export interface CategoryType {
   color: string;
 }
 
+
 export interface CategoriesResponse {
   message: string;
   data: CategoryType[];

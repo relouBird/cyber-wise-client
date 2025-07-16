@@ -3,6 +3,7 @@ import type {
   CategoryType,
   CourseResponse,
   CoursesResponse,
+  SubCourseResponse,
   SubCoursesInterface,
   SubCoursesResponse,
 } from "~/types/courses.type";
@@ -83,10 +84,10 @@ const useCoursesStore = defineStore("courses-store", {
       return response;
     },
 
-    async getFormationsCoursesSubscription(id: number | string) {
+    async getFormationsCoursesSubscription() {
       const response: AxiosResponse =
         service.fetchAllCoursesSub &&
-        (await service.fetchAllCoursesSub(id));
+        (await service.fetchAllCoursesSub(this.active_training));
 
       if (response.status == 200 || response.status == 201) {
         let data = response.data as SubCoursesResponse;
@@ -179,6 +180,29 @@ const useCoursesStore = defineStore("courses-store", {
         this.courses.splice(index, 1);
       } else if (response.status == 500) {
         console.log("error =>", response.data.message);
+      }
+    },
+
+    // ceci est la partie qui gere la partie utilisateur final
+    async completeCourse(courseId: number) {
+      const subCourse: SubCoursesInterface =
+        this.courses_sub.find((u) => u.id == courseId) ||
+        ({} as SubCoursesInterface);
+      const response: AxiosResponse = await service.completeUserCourse(
+        this.active_training,
+        courseId,
+        subCourse
+      );
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as SubCourseResponse;
+
+        const index = this.courses_sub.findIndex((u) => u.id == data.data.id);
+        if (index !== -1) {
+          this.courses_sub[index] = data.data;
+        }
+      } else if (response.status == 400) {
+        console.log("error =>", response.data);
       }
     },
   },

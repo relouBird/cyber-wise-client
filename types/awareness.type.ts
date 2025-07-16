@@ -93,6 +93,22 @@ export interface UpdateCampaignData extends Partial<CreateCampaignData> {
   status?: Campaign["status"];
 }
 
+// Types
+export interface UserCampaign {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  status: "draft" | "active" | "paused" | "completed";
+  startDate: Date;
+  endDate: Date;
+  totalFormations: number;
+  completedFormations: number;
+  userProgress: number;
+  userStatus: "not_started" | "in_progress" | "completed";
+  estimatedTime: number;
+}
+
 export interface Formation {
   id: string;
   title: string;
@@ -129,4 +145,14 @@ export interface CampaignsResponse {
 export interface CampaignUserResponse {
   message: string;
   data: CampaignUser[];
+}
+
+export interface UserCampaignsResponse {
+  message: string;
+  data: UserCampaign[];
+}
+
+export interface UserCampaignResponse {
+  message: string;
+  data: UserCampaign;
 }

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { finalUserFormationConst } from "~/constants/trainings.constant";
 import useAuthStore from "~/stores/auth.store";
 import useCoursesStore from "~/stores/courses.store";
 import useTrainingsStore from "~/stores/trainings.store";
@@ -301,7 +300,13 @@ watch(
             </div>
 
             <!-- Progress bar si formation commencée -->
-            <div v-if="formation.progress > 0" class="mb-3">
+            <div
+              v-if="
+                formation.status == 'in_progress' ||
+                formation.status == 'completed'
+              "
+              class="mb-3"
+            >
               <div class="d-flex justify-space-between align-center mb-1">
                 <span class="text-caption">Progression</span>
                 <span class="text-caption">{{ formation.progress }}%</span>
@@ -321,11 +326,21 @@ watch(
               variant="flat"
               block
               class="text-none"
-              :disabled="!formation.active"
+              :disabled="
+                !formation.active ||
+                formation.progress == 100 ||
+                formation.status == 'completed'
+              "
               :loading="loading == formation.id"
               @click.stop="startFormation(formation)"
             >
-              {{ formation.progress > 0 ? "Continuer" : "Commencer" }}
+              {{
+                formation.progress > 0 || formation.status == "in_progress"
+                  ? "Continuer"
+                  : formation.progress == 100
+                  ? "Terminé"
+                  : "Commencer"
+              }}
             </v-btn>
           </v-card-actions>
 

@@ -1,6 +1,7 @@
 import type { AxiosResponse } from "axios";
 import { request } from "~/helpers/request_axios";
 import type { ServiceProps } from "~/types/common.type";
+import type { SubCoursesInterface } from "~/types/courses.type";
 import type { Course, Domain } from "~/types/trainings.type";
 
 export default function useCoursesService(): ServiceProps {
@@ -63,6 +64,22 @@ export default function useCoursesService(): ServiceProps {
     });
   };
 
+  // Partie utilisateur final....
+
+  /**
+   * Ceci permet de completer un cours par un utilisateur...
+   */
+  const completeUserCourse = async (
+    fid: string,
+    id: string,
+    payload: SubCoursesInterface
+  ): Promise<AxiosResponse> => {
+    return await request(`/trainings/${fid}/courses/${id}`, {
+      method: "put",
+      data: payload,
+    });
+  };
+
   return {
     fetchAllCategories,
     createCourse,
@@ -70,5 +87,7 @@ export default function useCoursesService(): ServiceProps {
     fetchAllCoursesSub,
     updateCourse,
     getFormationCourses,
+    // partie utilisateur final
+    completeUserCourse,
   };
 }

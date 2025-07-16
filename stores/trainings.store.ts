@@ -176,6 +176,25 @@ const useTrainingsStore = defineStore("trainings-store", {
       return response;
     },
 
+    // partie qui gere les subscription aux formations
+    async getAllSubCampaignTraining(userId: string, campaignId: string) {
+      const response: AxiosResponse =
+        service.fetchAllCampaignSubTrainings &&
+        (await service.fetchAllCampaignSubTrainings(userId, campaignId));
+
+      if (response.status == 200 || response.status == 201) {
+        let data = response.data as SubTrainingsResponse;
+        console.log("data-sub-training =>", data.data);
+        this.sub_training_list = data.data;
+      } else if (response.status == 404) {
+        console.log("error =>", response.data);
+      } else if (response.status == 500) {
+        console.log("error =>", response.data);
+      }
+
+      return response;
+    },
+
     async createTraining(author_id: string, trainingForm: Formation) {
       let categorie =
         this.domains_list[
